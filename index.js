@@ -1,13 +1,18 @@
-const express = require('express'); // Importa o Express
-const app = express(); // Cria a aplicação Express
-const port = 3000; // Define a porta
+const express = require('express'); 
+const imgur = require('imgur');
+const fileUpload = require('express-fileupload')
 
-// Rota básica que responde "Hello, World"
+
+
+const app = express(); 
+const port = 3000; 
+
+
 app.get('/', (req, res) => {
     res.send('Hello, World');
 });
 
-// Inicia o servidor
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
