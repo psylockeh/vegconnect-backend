@@ -1,67 +1,51 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('usuario', {
-    id_user: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
-    },
-    nome: {
-      type: DataTypes.STRING(100),
-      allowNull: false
-    },
-    email: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-      unique: "email"
-    },
-    senha: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    foto_perfil: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    tp_user: {
-      type: DataTypes.ENUM('Chef','Estabelecimento','Administrador','UsuarioComum'),
-      allowNull: false
-    },
-    pref_alim: {
-      type: DataTypes.STRING(100),
-      allowNull: true
-    },
-    dt_nasc: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
-    },
-    dt_cadastro: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
-    }
-  }, {
-    sequelize,
-    tableName: 'usuario',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "id_user" },
-        ]
+
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database'); 
+    const User = sequelize.define('Usuario', {
+      id_user: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
-      {
-        name: "email",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "email" },
-        ]
+      nome: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
-    ]
-  });
-};
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      senha: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      foto_perfil: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tp_user: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      pref_alim: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      dt_nasc: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      dt_cadastro: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      }
+    }, {
+      tableName: 'usuario', 
+      freezeTableName: true,
+      timestamps: false,  
+    });
+  
+    module.exports = Usuario;
+  
+  
