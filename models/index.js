@@ -1,44 +1,32 @@
-'use strict';
-
 const express = require('express');
-const sequelize = require('./config/database');
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
-const db = {};
+const cors = require('cors');
+const sequelize = require('../config/database');
+require('../models/usuario');
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
-}
+const app = express();
+const port = process.env.PORT || 3000;
 
-fs
-  .readdirSync(__dirname)
-  .filter(file => {
-    return (
-      file.indexOf('.') !== 0 &&
-      file !== basename &&
-      file.slice(-3) === '.js' &&
-      file.indexOf('.test.js') === -1
-    );
-  })
-  .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-    db[model.name] = model;
-  });
+// Middlewares
+app.use(express.json());
+app.use(cors());
 
-Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
+// Rotas
+app.use('/auth', require('../routes/auth'));
+
+
+app.get('/', (req, res) => {
+    res.send('Hello, VegConnect!');
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+// Inicia o servidor
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ Conexão com o banco de dados estabelecida.');
+    console.log("🚀 Rotas Registradas:");
+console.log(app._router.stack.filter(r => r.route).map(r => r.route.path));
 
-module.exports = db;
+    app.listen(port, () => {
+      console.log(`🚀 Servidor rodando em http://localhost:${port}`);
+    });
+  })
+  .catch((error) => console.error('❌ Erro ao conectar ao banco de dados:', error));
