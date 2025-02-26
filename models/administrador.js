@@ -1,28 +1,34 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('administrador', {
-    id_user_adm: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'usuario',
-        key: 'id_user'
-      }
-    }
-  }, {
-    sequelize,
-    tableName: 'administrador',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "id_user_adm" },
-        ]
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('administrador', {
+      id_user_adm: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        allowNull: false,
+        references: {
+          model: 'usuario',
+          key: 'id_user'
+        },
+        onDelete: 'CASCADE'
       },
-    ]
-  });
+      cargo: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+      }
+    });
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('administrador');
+  }
 };

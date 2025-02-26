@@ -8,7 +8,11 @@ const Usuario = sequelize.define('Usuario', {
   senha: { type: DataTypes.STRING, allowNull: false },
   tp_user: { type: DataTypes.STRING, allowNull: false },
   pref_alim: { type: DataTypes.STRING, allowNull: false },
-  dt_nasc: { type: DataTypes.DATE, allowNull: false }
+  data_nascimento: { 
+    type: DataTypes.DATEONLY, 
+    allowNull: false, 
+    defaultValue: DataTypes.NOW 
+  },
 }, {
   tableName: 'usuario',  
   freezeTableName: true,

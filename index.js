@@ -4,7 +4,12 @@ const cors = require('cors');
 const sequelize = require('./config/database'); 
 require('./models/usuario'); 
 
+
+
 const app = express();
+
+app.use('/usuarios', require('./routes/usuario'));
+
 const port = process.env.PORT || 28147;
 
 // Middleware

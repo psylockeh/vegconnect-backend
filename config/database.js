@@ -11,5 +11,10 @@ const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USERNAME
 sequelize.authenticate()
   .then(() => console.log("✅ Banco de dados conectado!"))
   .catch(err => console.error("❌ Erro ao conectar ao banco:", err));
+  
+  sequelize.sync({ alter: true })
+  .then(() => console.log("📌 Banco atualizado!"))
+  .catch(err => console.error("❌ Erro ao atualizar:", err));
+
 
 module.exports = sequelize;

@@ -1,19 +1,23 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = process.env.JWT_SECRET || "chave_super_secreta";
 
 module.exports = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+    const authHeader = req.headers['authorization'];
 
-  if (!token) {
-    return res.status(401).json({ erro: "Acesso negado! Token não fornecido." });
-  }
+    if (!authHeader) {
+        return res.status(403).json({ erro: 'Acesso negado! Token não fornecido.' });
+    }
 
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.userId = decoded.id;
-    req.userEmail = decoded.email;
-    next();
-  } catch (error) {
-    res.status(401).json({ erro: "Token inválido!" });
-  }
+    const token = authHeader.split(' ')[1]; 
+
+    if (!token) {
+        return res.status(403).json({ erro: 'Token inválido ou ausente.' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ erro: 'Token inválido!' });
+        }
+        req.user = decoded;
+        next();
+    });
 };
