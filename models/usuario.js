@@ -45,6 +45,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("Vegano", "Vegetariano", "Restritivo"),
         allowNull: false,
       },
+      reset_token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      reset_token_expira: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       sequelize,

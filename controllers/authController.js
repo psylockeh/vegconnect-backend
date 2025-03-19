@@ -1,107 +1,94 @@
 const { Usuario } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto"); // Para gerar tokens de recuperação
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
-// Cadastro (signup)
-const signup = async (req, res) => {
-  const { nome, email, senha, tp_user, pref_alim, data_nascimento } = req.body;
-
-  if (!nome || !email || !senha || !tp_user || !pref_alim || !data_nascimento) {
-    return res.status(400).json({ error: "Todos os campos são obrigatórios." });
-  }
-
-  try {
-    const usuarioExistente = await Usuario.findOne({ where: { email } });
-
-    if (usuarioExistente) {
-      return res.status(400).json({ error: "Usuário já existe!" });
-    }
-
-    const hashedSenha = await bcrypt.hash(senha, 10);
-
-    const novoUsuario = await Usuario.create({
-      nome,
-      email,
-      senha: hashedSenha,
-      tp_user,
-      pref_alim,
-      data_nascimento,
-    });
-
-    return res.status(201).json({
-      id_user: novoUsuario.id_user,
-      nome: novoUsuario.nome,
-      email: novoUsuario.email,
-      tp_user: novoUsuario.tp_user,
-      pref_alim: novoUsuario.pref_alim,
-      data_nascimento: novoUsuario.data_nascimento,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Erro interno do servidor." });
-  }
-};
-
-// signin
-const signin = async (req, res) => {
-  console.log("🔹 Dados recebidos no backend:", req.body); // LOG PARA DEBUG
-
-  const { email, senha } = req.body;
-
-  if (!email || !senha) {
-    return res.status(400).json({ error: "Email e senha são obrigatórios." });
-  }
+// 🔹 Função para solicitar recuperação de senha
+exports.solicitarRecuperacaoSenha = async (req, res) => {
+  const { email } = req.body;
 
   try {
     const usuario = await Usuario.findOne({ where: { email } });
 
     if (!usuario) {
-      return res.status(404).json({ error: "Email ou senha incorretos." });
+      return res.status(404).json({ message: "E-mail não encontrado." });
     }
 
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    // 🔹 Gera um token de redefinição de senha
+    const token = crypto.randomBytes(20).toString("hex");
+    const expiracao = new Date();
+    expiracao.setHours(expiracao.getHours() + 1); // Expira em 1 hora
 
-    if (!senhaValida) {
-      return res.status(401).json({ error: "Email ou senha incorretos." });
-    }
+    // 🔹 Atualiza no banco de dados
+    await usuario.update({
+      reset_token: token,
+      reset_token_expira: expiracao,
+    });
 
-    const token = jwt.sign(
-      { id_user: usuario.id_user },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+    // 🔹 Configura Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    return res.status(200).json({ token });
+    // 🔹 Envia e-mail
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: usuario.email,
+      subject: "Recuperação de Senha - VegConnect",
+      html: `
+        <p>Olá ${usuario.nome},</p>
+        <p>Recebemos um pedido para redefinir sua senha. Clique no link abaixo:</p>
+        <p><a href="${process.env.FRONTEND_URL}/resetarSenha/${token}">Redefinir Senha</a></p>
+        <p>Este link expira em 1 hora.</p>
+        <p>Se não solicitou, ignore este e-mail.</p>
+        <p>Equipe VegConnect</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.json({ message: "E-mail de recuperação enviado com sucesso!" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Erro ao realizar login." });
+    console.error("Erro ao enviar e-mail:", error);
+    return res.status(500).json({ message: "Erro interno no servidor." });
   }
 };
 
-// buscar perfil (rota protegida)
-const getPerfil = async (req, res) => {
+// 🔹 Função para redefinir senha
+exports.redefinirSenha = async (req, res) => {
+  const { token, novaSenha } = req.body;
+
   try {
-    const usuario = await Usuario.findByPk(req.userId, {
-      attributes: [
-        "id_user",
-        "nome",
-        "email",
-        "tp_user",
-        "pref_alim",
-        "data_nascimento",
-      ],
+    const usuario = await Usuario.findOne({
+      where: {
+        reset_token: token,
+        reset_token_expira: { [Op.gt]: new Date() }, // Verifica se ainda é válido
+      },
     });
 
     if (!usuario) {
-      return res.status(404).json({ error: "Usuário não encontrado." });
+      return res.status(400).json({ message: "Token inválido ou expirado." });
     }
 
-    return res.status(200).json(usuario);
+    // 🔹 Hash da nova senha
+    const senhaHash = await bcrypt.hash(novaSenha, 10);
+
+    // 🔹 Atualiza no banco
+    await usuario.update({
+      senha: senhaHash,
+      reset_token: null,
+      reset_token_expira: null,
+    });
+
+    return res.json({ message: "Senha redefinida com sucesso!" });
   } catch (error) {
-    return res.status(500).json({ error: "Erro ao buscar perfil." });
+    console.error("Erro ao redefinir senha:", error);
+    return res.status(500).json({ message: "Erro interno no servidor." });
   }
 };
-
-module.exports = { signup, signin, getPerfil };

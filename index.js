@@ -10,3 +10,6 @@ app.use("/auth", require("./routes/authRoutes"));
 
 const PORT = process.env.PORT || 28147;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
+const usuarioRoutes = require("./routes/usuarioRoutes");
+app.use("/usuario", usuarioRoutes);
