@@ -1,17 +1,11 @@
-const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
-exports.validarTokenRecuperacao = (req, res, next) => {
-  const { token } = req.body;
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-  if (!token) {
-    return res.status(400).json({ error: "Token não fornecido." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.email = decoded.email;
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: "Token inválido ou expirado." });
-  }
-};
+module.exports = transporter;

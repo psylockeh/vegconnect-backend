@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       pref_alim: {
-        type: DataTypes.ENUM("Vegano", "Vegetariano", "Restritivo"),
+        type: DataTypes.ENUM("Vegano", "Vegetariano", "Dieta restritiva"),
         allowNull: false,
       },
       reset_token: {

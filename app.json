@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ec49858d-fc69-48de-90c6-3fd384e4bd94"
+      }
+    },
+    "android": {
+      "package": "com.nsilvadebora.vegconnectbackend"
+    }
+  }
+}

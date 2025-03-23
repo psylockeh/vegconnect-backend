@@ -1,66 +1,80 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
+const router = express.Router();
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { Usuario } = require("../models"); // Certifique-se de que o model do usuário está correto
-require("dotenv").config();
+const { Usuario } = require("../models");
+const { forgotPassword } = require("../controllers/authController");
 const {
   solicitarRecuperacaoSenha,
   redefinirSenha,
 } = require("../controllers/authController");
 
-const router = express.Router();
+// rota recuperacao de senha
 
-// 🔹 Rota para solicitar a recuperação de senha
 router.post("/recuperar-senha", solicitarRecuperacaoSenha);
-
-// 🔹 Rota para redefinir a senha usando o token enviado por e-mail
 router.post("/redefinir-senha", redefinirSenha);
 
-// 🔹 Rota de Login
-router.post("/login", async (req, res) => {
+// 🔹 Rota de Cadastro de Usuário
+router.post("/signup", async (req, res) => {
   try {
-    const { email, senha } = req.body;
+    const { nome, email, senha, tp_user, pref_alim, data_nascimento } =
+      req.body;
 
-    // 🔍 Verifica se o usuário existe no banco
-    const usuario = await Usuario.findOne({ where: { email } });
-
-    if (!usuario) {
-      return res.status(404).json({ msg: "Usuário não encontrado." });
+    // 📌 Verifica se todos os campos obrigatórios foram preenchidos
+    if (
+      !nome ||
+      !email ||
+      !senha ||
+      !tp_user ||
+      !pref_alim ||
+      !data_nascimento
+    ) {
+      return res
+        .status(400)
+        .json({ msg: "Preencha todos os campos obrigatórios." });
     }
 
-    // 🔍 Compara a senha com o hash salvo no banco
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-
-    if (!senhaValida) {
-      return res.status(401).json({ msg: "Credenciais inválidas." });
+    // 🔍 Verifica se o usuário já existe
+    const usuarioExistente = await Usuario.findOne({ where: { email } });
+    if (usuarioExistente) {
+      return res.status(400).json({ msg: "E-mail já cadastrado." });
     }
 
-    // 🔹 Gera o token JWT
+    // 🔑 Criptografa a senha antes de salvar
+    const senhaCriptografada = await bcrypt.hash(senha, 10);
+
+    // 📌 Cria o usuário no banco de dados
+    const novoUsuario = await Usuario.create({
+      nome,
+      email,
+      senha: senhaCriptografada,
+      tp_user,
+      pref_alim,
+      data_nascimento,
+    });
+
+    // 🔹 Gera um token JWT para o usuário recém-cadastrado
     const token = jwt.sign(
-      {
-        id: usuario.id_user,
-        email: usuario.email,
-        nome: usuario.nome,
-        tipo: usuario.tp_user, // Inclui o tipo de usuário
-      },
+      { id: novoUsuario.id, email: novoUsuario.email, nome: novoUsuario.nome },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" } // Token válido por 2 horas
+      { expiresIn: "2h" }
     );
 
-    res.json({
-      msg: "Login realizado com sucesso!",
+    res.status(201).json({
+      msg: "Usuário cadastrado com sucesso!",
       token,
       usuario: {
-        id: usuario.id_user,
-        nome: usuario.nome,
-        email: usuario.email,
-        tipo: usuario.tp_user,
+        id: novoUsuario.id_user,
+        nome: novoUsuario.nome,
+        email: novoUsuario.email,
+        tp_user: novoUsuario.tp_user,
       },
     });
   } catch (error) {
-    console.error("Erro ao autenticar usuário:", error);
+    console.error("Erro ao cadastrar usuário:", error);
     res.status(500).json({ msg: "Erro interno no servidor." });
   }
 });
 
+// 🔹 Exporte as rotas
 module.exports = router;
