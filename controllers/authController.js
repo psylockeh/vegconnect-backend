@@ -124,3 +124,82 @@ exports.signin = async (req, res) => {
     res.status(500).json({ msg: "Erro interno no servidor." });
   }
 };
+
+exports.signup = async (req, res) => {
+  const {
+    nome,
+    email,
+    senha,
+    telefone,
+    data_nascimento,
+    tp_user,
+    nickname,
+    bio,
+    foto_perfil,
+    nome_comercio,
+    tel_com,
+    especialidade,
+    tipo_prod,
+    tipo_com,
+    ender_com,
+    cnpj,
+    cep_com,
+    certificacoes,
+    cargo,
+    matricula,
+    pref_alim,
+  } = req.body;
+
+  if (!nome || !email || !senha || !data_nascimento || !tp_user) {
+    return res
+      .status(400)
+      .json({ msg: "Preencha todos os campos obrigatórios." });
+  }
+
+  try {
+    const usuarioExistente = await Usuario.findOne({ where: { email } });
+
+    if (usuarioExistente) {
+      return res.status(400).json({ msg: "E-mail já cadastrado." });
+    }
+
+    const senhaCriptografada = await bcrypt.hash(senha, 10);
+
+    const novoUsuario = await Usuario.create({
+      nome,
+      email,
+      senha: senhaCriptografada,
+      telefone,
+      data_nascimento,
+      tp_user,
+      nickname,
+      bio,
+      foto_perfil,
+      nome_comercio,
+      tel_com,
+      especialidade,
+      tipo_prod,
+      tipo_com,
+      ender_com,
+      cnpj,
+      cep_com,
+      certificacoes,
+      cargo,
+      matricula,
+      pref_alim,
+    });
+
+    return res.status(201).json({
+      msg: "Usuário cadastrado com sucesso!",
+      usuario: {
+        id_user: novoUsuario.id_user,
+        nome: novoUsuario.nome,
+        email: novoUsuario.email,
+        tp_user: novoUsuario.tp_user,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao cadastrar usuário:", error);
+    return res.status(500).json({ msg: "Erro interno ao cadastrar usuário." });
+  }
+};

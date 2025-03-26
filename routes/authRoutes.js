@@ -3,45 +3,42 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Usuario } = require("../models");
-const { forgotPassword } = require("../controllers/authController");
 const {
   solicitarRecuperacaoSenha,
   redefinirSenha,
 } = require("../controllers/authController");
-const { authMiddleware } = require("../middlewares/authMiddleware");
-
-// rota recuperacao de senha
+const authMiddleware = require("../middlewares/authMiddleware");
 
 router.post("/recuperar-senha", solicitarRecuperacaoSenha);
 router.post("/redefinir-senha", redefinirSenha);
 
-// login usuario
+// login
 router.post("/signin", async (req, res) => {
   try {
     const { email, senha } = req.body;
 
-    // campos preenchidos
     if (!email || !senha) {
       return res
         .status(400)
         .json({ msg: "Preencha todos os campos obrigatórios." });
     }
 
-    // usuario existe
     const usuario = await Usuario.findOne({ where: { email } });
     if (!usuario) {
       return res.status(404).json({ msg: "E-mail não cadastrado." });
     }
 
-    // senha correta
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
     if (!senhaCorreta) {
       return res.status(401).json({ msg: "Senha incorreta." });
     }
 
-    // gera token
     const token = jwt.sign(
-      { id: usuario.id_user, email: usuario.email, nome: usuario.nome },
+      {
+        id_user: usuario.id_user,
+        email: usuario.email,
+        nome: usuario.nome,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -62,13 +59,12 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-// cadastro usuario
+// cadastro
 router.post("/signup", async (req, res) => {
   try {
     const { nome, email, senha, tp_user, pref_alim, data_nascimento } =
       req.body;
 
-    // campos preenchidos
     if (
       !nome ||
       !email ||
@@ -82,16 +78,13 @@ router.post("/signup", async (req, res) => {
         .json({ msg: "Preencha todos os campos obrigatórios." });
     }
 
-    // usuario existe
     const usuarioExistente = await Usuario.findOne({ where: { email } });
     if (usuarioExistente) {
       return res.status(400).json({ msg: "E-mail já cadastrado." });
     }
 
-    // criptografa
     const senhaCriptografada = await bcrypt.hash(senha, 10);
 
-    // cria usuario
     const novoUsuario = await Usuario.create({
       nome,
       email,
@@ -101,9 +94,12 @@ router.post("/signup", async (req, res) => {
       data_nascimento,
     });
 
-    // gera token
     const token = jwt.sign(
-      { id: novoUsuario.id, email: novoUsuario.email, nome: novoUsuario.nome },
+      {
+        id_user: novoUsuario.id_user,
+        email: novoUsuario.email,
+        nome: novoUsuario.nome,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );

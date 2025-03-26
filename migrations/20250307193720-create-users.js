@@ -34,10 +34,64 @@ module.exports = {
         type: Sequelize.ENUM("Administrador", "Comerciante", "Comum", "Chef"),
         allowNull: false,
       },
+
+      // Comum
       pref_alim: {
-        type: Sequelize.ENUM("Vegano", "Vegetariano", "Dieta restritiva"),
-        allowNull: false,
+        type: Sequelize.STRING,
+        allowNull: true,
       },
+
+      // Comerciante
+      tipo_prod: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      tipo_com: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      nome_com: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      ender_com: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      cnpj: {
+        type: Sequelize.STRING(18),
+        allowNull: true,
+      },
+      cep_com: {
+        type: Sequelize.STRING(10),
+        allowNull: true,
+      },
+      tel_com: {
+        type: Sequelize.STRING(20),
+        allowNull: true,
+      },
+
+      // Chef
+      especialidade: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      certificacoes: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+
+      // Administrador
+      cargo: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      matricula: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+
+      // Metadata
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("Chef", "Administrador", "Comerciante", "Comum"),
         allowNull: false,
       },
+      //comum
       pref_alim: {
         type: DataTypes.ENUM("Vegano", "Vegetariano", "Dieta restritiva"),
         allowNull: false,
@@ -51,6 +52,56 @@ module.exports = (sequelize, DataTypes) => {
       },
       reset_token_expira: {
         type: DataTypes.DATE,
+        allowNull: true,
+      },
+
+      //comerciante
+      tipo_prod: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tipo_com: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      nome_com: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      ender_com: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      cnpj: {
+        type: DataTypes.STRING(18),
+        allowNull: true,
+      },
+      cep_com: {
+        type: DataTypes.STRING(10),
+        allowNull: true,
+      },
+      tel_com: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      },
+
+      //chef
+      especialidade: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      certificacoes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+
+      // admin
+      cargo: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      matricula: {
+        type: DataTypes.STRING(50),
         allowNull: true,
       },
     },
