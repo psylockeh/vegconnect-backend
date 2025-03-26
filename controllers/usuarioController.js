@@ -2,6 +2,7 @@ const { Usuario } = require("../models");
 
 exports.atualizarPerfil = async (req, res) => {
   const { id_user } = req.user;
+  console.log("Dados recebidos para atualização:", req.body);
 
   const {
     nome,
@@ -30,9 +31,9 @@ exports.atualizarPerfil = async (req, res) => {
       return res.status(404).json({ msg: "Usuário não encontrado." });
     }
 
-    await usuario.update({
+    const camposParaAtualizar = {
       nome,
-      telefone,
+      telefone: req.body.telefone,
       nickname,
       bio,
       foto_perfil,
@@ -48,7 +49,22 @@ exports.atualizarPerfil = async (req, res) => {
       cargo,
       matricula,
       pref_alim,
+    };
+
+    // Remove os campos com valor undefined
+    Object.keys(camposParaAtualizar).forEach(
+      (key) =>
+        camposParaAtualizar[key] === undefined &&
+        delete camposParaAtualizar[key]
+    );
+
+    console.log("📥 Campos para update:", camposParaAtualizar);
+
+    await usuario.update(camposParaAtualizar, {
+      where: { id_user },
     });
+
+    console.log("✅ Atualização executada!");
 
     const usuarioAtualizado = await Usuario.findByPk(id_user, {
       attributes: { exclude: ["senha"] },

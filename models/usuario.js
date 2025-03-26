@@ -20,6 +20,22 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      telefone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      nickname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      bio: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      foto_perfil: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       nome: {
         type: DataTypes.STRING,
         allowNull: false,
