@@ -79,3 +79,48 @@ exports.redefinirSenha = async (req, res) => {
     return res.status(500).json({ message: "Erro interno no servidor." });
   }
 };
+
+// login
+exports.signin = async (req, res) => {
+  const { email, senha } = req.body;
+
+  try {
+    if (!email || !senha) {
+      return res
+        .status(400)
+        .json({ msg: "Preencha todos os campos obrigatórios." });
+    }
+
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario) {
+      return res.status(404).json({ msg: "E-mail não cadastrado." });
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaCorreta) {
+      return res.status(401).json({ msg: "Senha incorreta." });
+    }
+
+    const token = jwt.sign(
+      { id_user: usuario.id_user, email: usuario.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    res.json({
+      msg: "Login efetuado com sucesso!",
+      token,
+      usuario: {
+        id_user: usuario.id_user,
+        nome: usuario.nome,
+        email: usuario.email,
+        tp_user: usuario.tp_user,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    res.status(500).json({ msg: "Erro interno no servidor." });
+  }
+};
