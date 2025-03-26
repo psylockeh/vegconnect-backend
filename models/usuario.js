@@ -22,19 +22,19 @@ module.exports = (sequelize, DataTypes) => {
       },
       telefone: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       nickname: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       bio: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       foto_perfil: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       nome: {
         type: DataTypes.STRING,
