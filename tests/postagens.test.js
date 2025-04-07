@@ -2,7 +2,7 @@ const request = require("supertest");
 const app = require("../app");
 const { sequelize } = require("../models");
 
-// Mock do middleware de autenticação
+// mock do middleware de autenticação
 jest.mock("../middlewares/authMiddleware", () => {
   return (req, res, next) => {
     req.user = {
