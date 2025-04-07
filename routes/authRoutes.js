@@ -9,10 +9,51 @@ const {
 } = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
+// Validação de campos no cadastro
+const validarCamposCadastro = (req, res, next) => {
+  const {
+    nome,
+    email,
+    senha,
+    tp_user,
+    pref_alim,
+    data_nascimento,
+    nickname,
+    telefone,
+  } = req.body;
+
+  if (
+    !nome ||
+    !email ||
+    !senha ||
+    !tp_user ||
+    !pref_alim ||
+    !data_nascimento ||
+    !nickname ||
+    !telefone
+  ) {
+    return res
+      .status(400)
+      .json({ msg: "Preencha todos os campos obrigatórios." });
+  }
+
+  // Validação da senha
+  if (
+    !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(senha)
+  ) {
+    return res.status(400).json({
+      msg: "A senha deve ter pelo menos 8 caracteres, incluindo um número, uma letra maiúscula e um caractere especial.",
+    });
+  }
+
+  next();
+};
+
+// Recuperação de senha
 router.post("/recuperar-senha", solicitarRecuperacaoSenha);
 router.post("/redefinir-senha", redefinirSenha);
 
-// login
+// Login
 router.post("/signin", async (req, res) => {
   try {
     const { email, senha } = req.body;
@@ -40,7 +81,7 @@ router.post("/signin", async (req, res) => {
         nome: usuario.nome,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     res.json({
@@ -51,6 +92,11 @@ router.post("/signin", async (req, res) => {
         nome: usuario.nome,
         email: usuario.email,
         tp_user: usuario.tp_user,
+        pref_alim: usuario.pref_alim,
+        data_nascimento: usuario.data_nascimento,
+        nickname: usuario.nickname,
+        telefone: usuario.telefone,
+        bio: usuario.bio,
       },
     });
   } catch (error) {
@@ -59,24 +105,19 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-// cadastro
-router.post("/signup", async (req, res) => {
+// Cadastro de usuário
+router.post("/signup", validarCamposCadastro, async (req, res) => {
   try {
-    const { nome, email, senha, tp_user, pref_alim, data_nascimento } =
-      req.body;
-
-    if (
-      !nome ||
-      !email ||
-      !senha ||
-      !tp_user ||
-      !pref_alim ||
-      !data_nascimento
-    ) {
-      return res
-        .status(400)
-        .json({ msg: "Preencha todos os campos obrigatórios." });
-    }
+    const {
+      nome,
+      email,
+      senha,
+      tp_user,
+      pref_alim,
+      data_nascimento,
+      nickname,
+      telefone,
+    } = req.body;
 
     const usuarioExistente = await Usuario.findOne({ where: { email } });
     if (usuarioExistente) {
@@ -92,6 +133,8 @@ router.post("/signup", async (req, res) => {
       tp_user,
       pref_alim,
       data_nascimento,
+      nickname,
+      telefone,
     });
 
     const token = jwt.sign(
@@ -101,7 +144,7 @@ router.post("/signup", async (req, res) => {
         nome: novoUsuario.nome,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     res.status(201).json({
@@ -112,6 +155,10 @@ router.post("/signup", async (req, res) => {
         nome: novoUsuario.nome,
         email: novoUsuario.email,
         tp_user: novoUsuario.tp_user,
+        pref_alim: novoUsuario.pref_alim,
+        data_nascimento: novoUsuario.data_nascimento,
+        nickname: novoUsuario.nickname,
+        telefone: novoUsuario.telefone,
       },
     });
   } catch (error) {

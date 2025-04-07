@@ -6,7 +6,7 @@ const transporter = require("../config/mail.Config");
 const { Op } = require("sequelize");
 require("dotenv").config();
 
-// recuperacao de senha
+// Recuperação de senha
 exports.solicitarRecuperacaoSenha = async (req, res) => {
   const { email } = req.body;
 
@@ -49,7 +49,7 @@ exports.solicitarRecuperacaoSenha = async (req, res) => {
   }
 };
 
-// redefine a senha
+// Redefine a senha
 exports.redefinirSenha = async (req, res) => {
   const { token, novaSenha } = req.body;
 
@@ -80,7 +80,7 @@ exports.redefinirSenha = async (req, res) => {
   }
 };
 
-// login
+// Login
 exports.signin = async (req, res) => {
   const { email, senha } = req.body;
 
@@ -106,7 +106,7 @@ exports.signin = async (req, res) => {
     const token = jwt.sign(
       { id_user: usuario.id_user, email: usuario.email },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     res.json({
@@ -136,7 +136,7 @@ exports.signup = async (req, res) => {
     nickname,
     bio,
     foto_perfil,
-    nome_comercio,
+    nome_com,
     tel_com,
     especialidade,
     tipo_prod,
@@ -163,6 +163,21 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ msg: "E-mail já cadastrado." });
     }
 
+    // Validação dos campos de acordo com o tipo de usuário
+    if (tp_user === "comerciante") {
+      if (!nome_com || !tel_com || !cnpj || !cep_com) {
+        return res.status(400).json({
+          msg: "Campos do comerciante obrigatórios: nome do comércio, telefone, CNPJ e CEP.",
+        });
+      }
+    } else if (tp_user === "chef") {
+      if (!especialidade) {
+        return res.status(400).json({
+          msg: "Campo de especialidade obrigatório para chef.",
+        });
+      }
+    }
+
     const senhaCriptografada = await bcrypt.hash(senha, 10);
 
     const novoUsuario = await Usuario.create({
@@ -175,7 +190,7 @@ exports.signup = async (req, res) => {
       nickname,
       bio,
       foto_perfil,
-      nome_comercio,
+      nome_comercio: nome_com,
       tel_com,
       especialidade,
       tipo_prod,
@@ -196,6 +211,9 @@ exports.signup = async (req, res) => {
         nome: novoUsuario.nome,
         email: novoUsuario.email,
         tp_user: novoUsuario.tp_user,
+        telefone: novoUsuario.telefone,
+        data_nascimento: novoUsuario.data_nascimento,
+        nickname: novoUsuario.nickname,
       },
     });
   } catch (error) {

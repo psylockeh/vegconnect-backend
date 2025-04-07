@@ -22,11 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       telefone: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       nickname: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       bio: {
         type: DataTypes.STRING,
@@ -125,7 +125,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "Usuario",
       tableName: "usuario",
-    }
+    },
   );
 
   return Usuario;

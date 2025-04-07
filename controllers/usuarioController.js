@@ -10,7 +10,7 @@ exports.atualizarPerfil = async (req, res) => {
     nickname,
     bio,
     foto_perfil,
-    nome_comercio,
+    nome_com,
     tel_com,
     especialidade,
     tipo_prod,
@@ -31,13 +31,28 @@ exports.atualizarPerfil = async (req, res) => {
       return res.status(404).json({ msg: "Usuário não encontrado." });
     }
 
+    // Validação dos campos obrigatórios para os tipos de usuário
+    if (usuario.tp_user === "comerciante") {
+      if (!nome_com || !tel_com || !cnpj || !cep_com) {
+        return res.status(400).json({
+          msg: "Campos do comerciante obrigatórios: nome do comércio, telefone, CNPJ e CEP.",
+        });
+      }
+    } else if (usuario.tp_user === "chef") {
+      if (!especialidade) {
+        return res.status(400).json({
+          msg: "Campo de especialidade obrigatório para chef.",
+        });
+      }
+    }
+
     const camposParaAtualizar = {
       nome,
-      telefone: req.body.telefone,
+      telefone,
       nickname,
       bio,
       foto_perfil,
-      nome_comercio,
+      nome_com,
       tel_com,
       especialidade,
       tipo_prod,
@@ -55,14 +70,12 @@ exports.atualizarPerfil = async (req, res) => {
     Object.keys(camposParaAtualizar).forEach(
       (key) =>
         camposParaAtualizar[key] === undefined &&
-        delete camposParaAtualizar[key]
+        delete camposParaAtualizar[key],
     );
 
     console.log("📥 Campos para update:", camposParaAtualizar);
 
-    await usuario.update(camposParaAtualizar, {
-      where: { id_user },
-    });
+    await usuario.update(camposParaAtualizar);
 
     console.log("✅ Atualização executada!");
 

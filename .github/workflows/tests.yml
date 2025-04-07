@@ -1,0 +1,49 @@
+name: Testes Automatizados
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: vegconnect_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Clonando o repositório
+        uses: actions/checkout@v3
+
+      - name: Configurando Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Instalando dependências
+        run: npm install
+
+      - name: Esperando o banco subir
+        run: sleep 20
+
+      - name: Rodando migrations
+        run: npx sequelize-cli db:migrate --env test
+
+      - name: Rodando seed de usuário de teste
+        run: npx sequelize-cli db:seed:all --env test
+
+      - name: Rodando os testes
+        run: npm test

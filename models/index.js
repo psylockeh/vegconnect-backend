@@ -2,20 +2,22 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const basename = path.basename(__filename);
-require("dotenv").config();
+
+const env = process.env.NODE_ENV || "development";
+if (env !== "test") {
+  require("dotenv").config();
+}
+
+const config = require(__dirname + "/../config/config.js")[env];
+
+console.log("🌱 Ambiente:", env);
+console.log("🎯 Usando config:", config.database, config.host);
 
 const sequelize = new Sequelize(
-  process.env.DB_DATABASE,
-  process.env.DB_USER,
-  process.env.DB_PASS,
-  {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    dialect: process.env.DB_DIALECT,
-    dialectOptions: {
-      connectTimeout: 60000,
-    },
-  }
+  config.database,
+  config.username,
+  config.password,
+  config
 );
 
 sequelize
