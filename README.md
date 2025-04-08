@@ -1,6 +1,6 @@
 ### 📊 Cobertura de Testes
 
-![Statements](coverage/badge-statements.svg)
-![Branches](coverage/badge-branches.svg)
-![Functions](coverage/badge-functions.svg)
-![Lines](coverage/badge-lines.svg)
+### STATEMENTS ![Statements](coverage/badge-statements.svg)
+### BRANCHES ![Branches](coverage/badge-branches.svg)
+### FUNCTIONS ![Functions](coverage/badge-functions.svg)
+### LINES ![Lines](coverage/badge-lines.svg)
