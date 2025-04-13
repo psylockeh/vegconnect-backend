@@ -4,6 +4,8 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
+app.use(uploadRoutes);
 
 const app = express();
 
