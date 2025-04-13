@@ -18,9 +18,10 @@ yarn-error.log*
 dist/
 build/
 
-# Coverage de testes
-coverage/
-.nyc_output/
+# Permite apenas os badges de cobertura
+!coverage/badge-*.svg
+
+yc_output/
 
 # IDEs e editores
 .vscode/

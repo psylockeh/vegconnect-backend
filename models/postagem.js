@@ -31,7 +31,7 @@ module.exports = (sequelize) => {
           "evento",
           "estabelecimento",
           "promocao",
-          "repost",
+          "repost"
         ),
         allowNull: false,
       },
@@ -96,6 +96,14 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      valor: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      links: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
 
       // Campos específicos de COMÉRCIO
       nome_comercio: {
@@ -132,7 +140,7 @@ module.exports = (sequelize) => {
       modelName: "Postagem",
       tableName: "postagens",
       timestamps: true,
-    },
+    }
   );
 
   return Postagem;

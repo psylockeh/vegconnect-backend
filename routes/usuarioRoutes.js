@@ -3,6 +3,8 @@ const { atualizarPerfil } = require("../controllers/usuarioController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getPerfil } = require("../controllers/usuarioController");
 const { criar } = require("../controllers/postagemController");
+const postagemController = require("../controllers/postagemController");
+
 const router = express.Router();
 
 router.use(authMiddleware);
@@ -15,5 +17,8 @@ router.get("/perfil", authMiddleware, getPerfil);
 
 // cria postagem
 router.post("/postagens", authMiddleware, criar);
+
+// busca postagens
+router.get("/postagens", postagemController.listar);
 
 module.exports = router;

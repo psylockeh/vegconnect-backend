@@ -1,6 +1,26 @@
-const { Postagem } = require("../models");
+const { Postagem, Usuario } = require("../models");
 
 const PostagemController = {
+  async listar(req, res) {
+    try {
+      const postagens = await Postagem.findAll({
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: Usuario,
+            as: "autor",
+            attributes: ["id_user", "nome", "tp_user"],
+          },
+        ],
+      });
+
+      return res.status(200).json(postagens);
+    } catch (error) {
+      console.error("Erro ao listar postagens:", error);
+      return res.status(500).json({ erro: "Erro ao buscar postagens." });
+    }
+  },
+
   async criar(req, res) {
     try {
       const {
@@ -24,7 +44,7 @@ const PostagemController = {
         endereco,
       } = req.body;
 
-      const { id_user, tipo_usuario } = req.user;
+      const { id_user, tp_user, tipo_usuario } = req.user;
 
       // 1. Validação de permissão por tipo de usuário
       const permissoes = {
@@ -39,9 +59,9 @@ const PostagemController = {
         ],
       };
 
-      if (!permissoes[tipo_usuario]?.includes(tp_post)) {
+      if (!permissoes[(tp_user, tipo_usuario)]?.includes(tp_post)) {
         return res.status(403).json({
-          erro: `Usuário do tipo ${tipo_usuario} não pode criar postagens do tipo ${tp_post}.`,
+          erro: `Usuário do tipo ${(tp_user, tipo_usuario)} não pode criar postagens do tipo ${tp_post}.`,
         });
       }
 
@@ -68,7 +88,7 @@ const PostagemController = {
         conteudo,
         categoria: categoria || null,
         tag: tag || null,
-        selo_confiança: false,
+        selo_confiança: tp_user === "Chef",
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
@@ -86,6 +106,8 @@ const PostagemController = {
           Object.assign(dadosBase, {
             data,
             localizacao,
+            valor,
+            links,
           });
           break;
 

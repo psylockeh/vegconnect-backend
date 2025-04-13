@@ -26,7 +26,7 @@ module.exports = {
           "evento",
           "estabelecimento",
           "promocao",
-          "repost",
+          "repost"
         ),
         allowNull: false,
       },
@@ -63,8 +63,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
-
-      // RECEITA
+      // Campos de receita
       temp_prep: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -81,8 +80,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-
-      // EVENTO
+      // Campos de evento
       data: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -91,8 +89,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-
-      // COMÉRCIO
+      valor: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      links: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      // Campos de estabelecimento
       nome_comercio: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -121,7 +126,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
