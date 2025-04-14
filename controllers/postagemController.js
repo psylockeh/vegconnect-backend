@@ -1,6 +1,31 @@
 const { Postagem, Usuario } = require("../models");
 
 const PostagemController = {
+  async detalhar(req, res) {
+    try {
+      const { id } = req.params;
+
+      const postagem = await Postagem.findByPk(id, {
+        include: [
+          {
+            model: Usuario,
+            as: "autor",
+            attributes: ["id_user", "nome", "tp_user"],
+          },
+        ],
+      });
+
+      if (!postagem) {
+        return res.status(404).json({ erro: "Postagem não encontrada." });
+      }
+
+      return res.status(200).json(postagem);
+    } catch (error) {
+      console.error("Erro ao buscar postagem:", error);
+      return res.status(500).json({ erro: "Erro ao buscar postagem." });
+    }
+  },
+
   async listar(req, res) {
     try {
       const postagens = await Postagem.findAll({

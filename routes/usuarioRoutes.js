@@ -21,4 +21,7 @@ router.post("/postagens", authMiddleware, criar);
 // busca postagens
 router.get("/postagens", postagemController.listar);
 
+// busca postagem por id
+router.get("/postagens/:id", postagemController.detalhar);
+
 module.exports = router;
