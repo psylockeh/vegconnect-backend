@@ -24,6 +24,9 @@ module.exports = {
     dialect: "mysql",
     dialectOptions: {
       connectTimeout: 60000,
+      charset: "utf8mb4",
+      supportBigNumbers: true,
+      bigNumberStrings: true,
     },
   },
 

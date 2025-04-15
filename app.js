@@ -5,7 +5,6 @@ require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
-app.use(uploadRoutes);
 
 const app = express();
 
@@ -14,5 +13,6 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/usuario", usuarioRoutes);
+app.use(uploadRoutes);
 
 module.exports = app;
