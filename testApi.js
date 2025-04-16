@@ -8,7 +8,7 @@ async function testApi() {
 
   console.log("🔹 Enviando:", payload); // <-- Verificar se os dados estão corretos
 
-  const response = await fetch("http:// 172.20.10.11:28147/auth/signin", {
+  const response = await fetch("http://localhost:28147/auth/signin", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
