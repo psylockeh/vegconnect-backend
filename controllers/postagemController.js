@@ -47,6 +47,8 @@ const PostagemController = {
   },
 
   async criar(req, res) {
+    console.log("USUÁRIO AUTENTICADO:", req.user);
+
     try {
       const {
         tp_post,
@@ -84,9 +86,9 @@ const PostagemController = {
         ],
       };
 
-      if (!permissoes[(tp_user, tipo_usuario)]?.includes(tp_post)) {
+      if (!permissoes[tp_user]?.includes(tp_post)) {
         return res.status(403).json({
-          erro: `Usuário do tipo ${(tp_user, tipo_usuario)} não pode criar postagens do tipo ${tp_post}.`,
+          erro: `Usuário do tipo ${tp_user} não pode criar postagens do tipo ${tp_post}.`,
         });
       }
 

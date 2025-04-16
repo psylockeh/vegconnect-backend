@@ -104,9 +104,13 @@ exports.signin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id_user: usuario.id_user, email: usuario.email },
+      {
+        id_user: usuario.id_user,
+        email: usuario.email,
+        tp_user: usuario.tp_user,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" },
+      { expiresIn: "2h" }
     );
 
     res.json({
