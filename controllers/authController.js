@@ -11,7 +11,10 @@ exports.solicitarRecuperacaoSenha = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const usuario = await Usuario.findOne({ where: { email } });
+    const usuario = await Usuario.findOne({
+      where: { email },
+      attributes: ["id_user", "nome", "email", "senha", "tp_user"],
+    });
 
     if (!usuario) {
       return res.status(404).json({ message: "E-mail não encontrado." });
@@ -91,41 +94,64 @@ exports.signin = async (req, res) => {
         .json({ msg: "Preencha todos os campos obrigatórios." });
     }
 
-    const usuario = await Usuario.findOne({ where: { email } });
+    // 🔍 Buscar usuário com tp_user explicitamente
+    const usuario = await Usuario.findOne({
+      where: { email },
+      attributes: ["id_user", "nome", "email", "senha", "tp_user"],
+    });
+
+    const usuarioData = usuario.get({ plain: true });
+
+    console.log("🧪 Dados convertidos com get():", usuarioData);
+
+    console.log("🔥 Resultado bruto do Sequelize:", usuario?.dataValues);
 
     if (!usuario) {
+      console.warn("❌ Usuário não encontrado para este e-mail:", email);
       return res.status(404).json({ msg: "E-mail não cadastrado." });
     }
 
+    // 🔐 Comparar senha
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
-
     if (!senhaCorreta) {
+      console.warn("❌ Senha incorreta para:", email);
       return res.status(401).json({ msg: "Senha incorreta." });
     }
 
+    console.log("✅ Usuário autenticado:", {
+      id_user: usuario.id_user,
+      email: usuario.email,
+      tp_user: usuario.tp_user,
+    });
+
+    if (!usuario.tp_user) {
+      console.warn("⚠️ ALERTA: tp_user está undefined neste momento!");
+    }
+
+    // 🪙 Criar token
     const token = jwt.sign(
       {
-        id_user: usuario.id_user,
-        email: usuario.email,
-        tp_user: usuario.tp_user,
+        id_user: usuarioData.id_user,
+        email: usuarioData.email,
+        tp_user: usuarioData.tp_user,
       },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
-    res.json({
+    return res.json({
       msg: "Login efetuado com sucesso!",
       token,
       usuario: {
-        id_user: usuario.id_user,
-        nome: usuario.nome,
-        email: usuario.email,
-        tp_user: usuario.tp_user,
+        id_user: usuarioData.id_user,
+        nome: usuarioData.nome,
+        email: usuarioData.email,
+        tp_user: usuarioData.tp_user,
       },
     });
   } catch (error) {
-    console.error("Erro ao fazer login:", error);
-    res.status(500).json({ msg: "Erro interno no servidor." });
+    console.error("❌ Erro ao fazer login:", error);
+    return res.status(500).json({ msg: "Erro interno no servidor." });
   }
 };
 

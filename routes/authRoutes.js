@@ -6,6 +6,7 @@ const { Usuario } = require("../models");
 const {
   solicitarRecuperacaoSenha,
   redefinirSenha,
+  signin,
 } = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
@@ -54,56 +55,8 @@ router.post("/recuperar-senha", solicitarRecuperacaoSenha);
 router.post("/redefinir-senha", redefinirSenha);
 
 // Login
-router.post("/signin", async (req, res) => {
-  try {
-    const { email, senha } = req.body;
-
-    if (!email || !senha) {
-      return res
-        .status(400)
-        .json({ msg: "Preencha todos os campos obrigatórios." });
-    }
-
-    const usuario = await Usuario.findOne({ where: { email } });
-    if (!usuario) {
-      return res.status(404).json({ msg: "E-mail não cadastrado." });
-    }
-
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaCorreta) {
-      return res.status(401).json({ msg: "Senha incorreta." });
-    }
-
-    const token = jwt.sign(
-      {
-        id_user: usuario.id_user,
-        email: usuario.email,
-        nome: usuario.nome,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "2h" },
-    );
-
-    res.json({
-      msg: "Login efetuado com sucesso!",
-      token,
-      usuario: {
-        id: usuario.id_user,
-        nome: usuario.nome,
-        email: usuario.email,
-        tp_user: usuario.tp_user,
-        pref_alim: usuario.pref_alim,
-        data_nascimento: usuario.data_nascimento,
-        nickname: usuario.nickname,
-        telefone: usuario.telefone,
-        bio: usuario.bio,
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao fazer login:", error);
-    res.status(500).json({ msg: "Erro interno no servidor." });
-  }
-});
+// ✅ Chamada real do controller atualizado
+router.post("/signin", signin);
 
 // Cadastro de usuário
 router.post("/signup", validarCamposCadastro, async (req, res) => {
@@ -144,7 +97,7 @@ router.post("/signup", validarCamposCadastro, async (req, res) => {
         nome: novoUsuario.nome,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" },
+      { expiresIn: "2h" }
     );
 
     res.status(201).json({

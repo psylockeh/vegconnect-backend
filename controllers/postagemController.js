@@ -71,7 +71,7 @@ const PostagemController = {
         endereco,
       } = req.body;
 
-      const { id_user, tp_user, tipo_usuario } = req.user;
+      const { id_user, tp_user } = req.user;
 
       // 1. Validação de permissão por tipo de usuário
       const permissoes = {
@@ -85,7 +85,7 @@ const PostagemController = {
           "promocao",
         ],
       };
-
+      console.log("Tipo de usuário:", tp_user, "| Tipo de postagem:", tp_post);
       if (!permissoes[tp_user]?.includes(tp_post)) {
         return res.status(403).json({
           erro: `Usuário do tipo ${tp_user} não pode criar postagens do tipo ${tp_post}.`,
