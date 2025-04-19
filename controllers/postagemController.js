@@ -10,7 +10,13 @@ const PostagemController = {
           {
             model: Usuario,
             as: "autor",
-            attributes: ["id_user", "nome", "tp_user"],
+            attributes: [
+              "id_user",
+              "nome",
+              "tp_user",
+              "foto_perfil",
+              "nickname",
+            ],
           },
         ],
       });
@@ -34,7 +40,13 @@ const PostagemController = {
           {
             model: Usuario,
             as: "autor",
-            attributes: ["id_user", "nome", "tp_user"],
+            attributes: [
+              "id_user",
+              "nome",
+              "tp_user",
+              "foto_perfil",
+              "nickname",
+            ],
           },
         ],
       });
@@ -69,6 +81,8 @@ const PostagemController = {
         hora_fechamento,
         cep,
         endereco,
+        valor,
+        links,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -121,15 +135,25 @@ const PostagemController = {
       // 3. Preenchimento condicional conforme o tipo da postagem
       switch (tp_post) {
         case "receita":
+          if (!nome_receita || !ingredientes || !instrucoes || !temp_prep) {
+            return res
+              .status(400)
+              .json({ msg: "Todos os campos da receita são obrigatórios." });
+          }
           Object.assign(dadosBase, {
-            temp_prep,
-            instrucoes,
-            ingredientes,
             nome_receita,
+            ingredientes,
+            instrucoes,
+            temp_prep,
           });
           break;
 
         case "evento":
+          if (valor === undefined || isNaN(valor) || !localizacao) {
+            return res.status(400).json({
+              msg: "Localização e valor numérico são obrigatórios para evento.",
+            });
+          }
           Object.assign(dadosBase, {
             data,
             localizacao,
@@ -139,6 +163,19 @@ const PostagemController = {
           break;
 
         case "estabelecimento":
+          if (
+            !nome_comercio ||
+            !descricao_comercio ||
+            !tp_comida ||
+            !hora_abertura ||
+            !hora_fechamento ||
+            !cep ||
+            !endereco
+          ) {
+            return res.status(400).json({
+              msg: "Todos os campos de estabelecimento são obrigatórios.",
+            });
+          }
           Object.assign(dadosBase, {
             nome_comercio,
             descricao_comercio,
