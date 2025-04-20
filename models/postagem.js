@@ -43,11 +43,22 @@ module.exports = (sequelize) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      midia_urls: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        get() {
+          const rawValue = this.getDataValue("midia_urls");
+          return rawValue ? JSON.parse(rawValue) : [];
+        },
+        set(value) {
+          this.setDataValue("midia_urls", JSON.stringify(value));
+        },
+      },
       categoria: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      selo_confiança: {
+      selo_confianca: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,

@@ -42,7 +42,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      selo_confiança: {
+      selo_confianca: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,

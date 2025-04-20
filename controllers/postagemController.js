@@ -6,6 +6,19 @@ const PostagemController = {
       const { id } = req.params;
 
       const postagem = await Postagem.findByPk(id, {
+        attributes: [
+          "id",
+          "usuario_id",
+          "tp_post",
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "selo_confianca",
+          "createdAt",
+          "updatedAt",
+          "midia_urls",
+        ],
         include: [
           {
             model: Usuario,
@@ -36,6 +49,19 @@ const PostagemController = {
     try {
       const postagens = await Postagem.findAll({
         order: [["createdAt", "DESC"]],
+        attributes: [
+          "id",
+          "usuario_id",
+          "tp_post",
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "selo_confianca",
+          "createdAt",
+          "updatedAt",
+          "midia_urls",
+        ],
         include: [
           {
             model: Usuario,
@@ -83,6 +109,7 @@ const PostagemController = {
         endereco,
         valor,
         links,
+        midia_urls,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -129,7 +156,8 @@ const PostagemController = {
         conteudo,
         categoria: categoria || null,
         tag: tag || null,
-        selo_confiança: tp_user === "Chef",
+        selo_confianca: tp_user === "Chef",
+        midia_urls: req.body.midia_urls || null,
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
@@ -145,6 +173,7 @@ const PostagemController = {
             ingredientes,
             instrucoes,
             temp_prep,
+            midia_urls,
           });
           break;
 
@@ -159,6 +188,7 @@ const PostagemController = {
             localizacao,
             valor,
             links,
+            midia_urls,
           });
           break;
 
@@ -184,8 +214,12 @@ const PostagemController = {
             hora_fechamento,
             cep,
             endereco,
+            midia_urls,
           });
           break;
+      }
+      if (req.body.midia_urls) {
+        dadosBase.midia_urls = req.body.midia_urls;
       }
 
       // 4. Criar postagem
