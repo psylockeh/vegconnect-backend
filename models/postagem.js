@@ -61,7 +61,7 @@ module.exports = (sequelize) => {
       selo_confianca: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: true,
       },
       tag: {
         type: DataTypes.STRING,

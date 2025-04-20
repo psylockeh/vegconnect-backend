@@ -1,4 +1,3 @@
-const { Op } = require('sequelize');
 const { Usuario } = require("../models");
 
 exports.atualizarPerfil = async (req, res) => {
@@ -109,35 +108,5 @@ exports.getPerfil = async (req, res) => {
   } catch (error) {
     console.error("Erro ao carregar perfil:", error);
     return res.status(500).json({ msg: "Erro interno no servidor." });
-  }
-};
-
-
-//Pesuisar Usuarios
-
-exports.pesquisarUsuarios = async (req, res) => {
-  const { novoUsuario } = req.query;
-
-  let whereClause = {};
-  if (novoUsuario) {
-    whereClause = {
-      [Op.or]: [
-        { nome: { [Op.like]: `%${novoUsuario}%` } },
-        { nickname: { [Op.like]: `%${novoUsuario}%` } },
-        { tp_user: { [Op.like]: `%${novoUsuario}%` } },
-      ],
-    };
-  }
-
-  try {
-    const usuarios = await Usuario.findAll({
-      where: whereClause,
-      attributes: { exclude: ['senha'] },
-    });
-
-    return res.status(200).json(usuarios);
-  } catch (error) {
-    console.error('Erro ao consultar usuários:', error);
-    return res.status(500).json({ msg: 'Erro interno no servidor' });
   }
 };
