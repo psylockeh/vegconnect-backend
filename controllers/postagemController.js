@@ -256,6 +256,7 @@ const PostagemController = {
           },
           attributes: { exclude: ["senha"] },
         });
+        
       } else if (
         ["recado", "receita", "evento", "estabelecimento", "promocao"].includes(
           tipo
@@ -263,8 +264,7 @@ const PostagemController = {
       ) {
         const filtros = {
           recado: [
-            { nome: { [Op.like]: `%${pesquisa}%` } },
-            { descricao: { [Op.like]: `%${pesquisa}%` } },
+            { conteudo: { [Op.like]: `%${pesquisa}%` } },
           ],
           receita: [
             { nome_receita: { [Op.like]: `%${pesquisa}%` } },
