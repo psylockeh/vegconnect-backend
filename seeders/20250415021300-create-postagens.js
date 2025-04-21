@@ -10,7 +10,7 @@ module.exports = {
         conteudo:
           "Essa receita é deliciosa e sem ingredientes de origem animal.",
         categoria: "doces",
-        selo_confiança: false,
+        selo_confianca: false,
         tag: "vegano, sobremesa",
         temp_prep: "30 minutos",
         instrucoes: "Misture tudo e leve ao forno",

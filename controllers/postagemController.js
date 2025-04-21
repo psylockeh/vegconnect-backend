@@ -1,12 +1,24 @@
-
 const { Postagem, Usuario } = require("../models");
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 const PostagemController = {
   async detalhar(req, res) {
     try {
       const { id } = req.params;
 
       const postagem = await Postagem.findByPk(id, {
+        attributes: [
+          "id",
+          "usuario_id",
+          "tp_post",
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "selo_confianca",
+          "createdAt",
+          "updatedAt",
+          "midia_urls",
+        ],
         include: [
           {
             model: Usuario,
@@ -37,6 +49,19 @@ const PostagemController = {
     try {
       const postagens = await Postagem.findAll({
         order: [["createdAt", "DESC"]],
+        attributes: [
+          "id",
+          "usuario_id",
+          "tp_post",
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "selo_confianca",
+          "createdAt",
+          "updatedAt",
+          "midia_urls",
+        ],
         include: [
           {
             model: Usuario,
@@ -84,6 +109,7 @@ const PostagemController = {
         endereco,
         valor,
         links,
+        midia_urls,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -130,7 +156,8 @@ const PostagemController = {
         conteudo,
         categoria: categoria || null,
         tag: tag || null,
-        // selo_confiança: tp_user === "Chef",
+        // selo_confianca: tp_user === "Chef",
+        midia_urls: req.body.midia_urls || null,
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
@@ -146,6 +173,7 @@ const PostagemController = {
             ingredientes,
             instrucoes,
             temp_prep,
+            midia_urls,
           });
           break;
 
@@ -160,6 +188,7 @@ const PostagemController = {
             localizacao,
             valor,
             links,
+            midia_urls,
           });
           break;
 
@@ -185,8 +214,12 @@ const PostagemController = {
             hora_fechamento,
             cep,
             endereco,
+            midia_urls,
           });
           break;
+      }
+      if (req.body.midia_urls) {
+        dadosBase.midia_urls = req.body.midia_urls;
       }
 
       // 4. Criar postagem
@@ -203,14 +236,16 @@ const PostagemController = {
   async pesquisaGeral(req, res) {
     try {
       const { tipo, pesquisa } = req.query;
-  
+
       if (!pesquisa || !tipo) {
-        return res.status(400).json({ msg: "📌 Digite o que deseja pesquisar!!" });
+        return res
+          .status(400)
+          .json({ msg: "📌 Digite o que deseja pesquisar!!" });
       }
-  
+
       let results = [];
-  
-      if (tipo === 'usuario') {
+
+      if (tipo === "usuario") {
         results = await Usuario.findAll({
           where: {
             [Op.or]: [
@@ -219,9 +254,13 @@ const PostagemController = {
               { tp_user: { [Op.like]: `%${pesquisa}%` } },
             ],
           },
-          attributes: { exclude: ['senha'] },
+          attributes: { exclude: ["senha"] },
         });
-      } else if (['recado','receita', 'evento', 'estabelecimento', 'promocao'].includes(tipo)) {
+      } else if (
+        ["recado", "receita", "evento", "estabelecimento", "promocao"].includes(
+          tipo
+        )
+      ) {
         const filtros = {
           recado: [
             { nome: { [Op.like]: `%${pesquisa}%` } },
@@ -248,7 +287,7 @@ const PostagemController = {
             { nome_comercio: { [Op.like]: `%${pesquisa}%` } },
           ],
         };
-  
+
         results = await Postagem.findAll({
           where: {
             tp_post: tipo,
@@ -256,19 +295,21 @@ const PostagemController = {
           },
         });
       } else {
-        return res.status(400).json({ msg: '❌ Erro ao realizar pesquisa!!' });
+        return res.status(400).json({ msg: "❌ Erro ao realizar pesquisa!!" });
       }
-  
+
       if (results.length === 0) {
-        return res.status(404).json({ msg: '🌱 Nenhum resultado encontrado.' });
+        return res.status(404).json({ msg: "🌱 Nenhum resultado encontrado." });
       }
-  
+
       return res.status(200).json(results);
     } catch (error) {
-      console.error('Erro ao pesquisar:', error);
-      return res.status(500).json({ msg: '❌ Erro interno no servidor ao realizar a pesquisa!!' });
+      console.error("Erro ao pesquisar:", error);
+      return res
+        .status(500)
+        .json({ msg: "❌ Erro interno no servidor ao realizar a pesquisa!!" });
     }
-  }
+  },
 };
 
 module.exports = PostagemController;
