@@ -1,5 +1,6 @@
 const { Postagem, Usuario } = require("../models");
 const { Op } = require("sequelize");
+
 const PostagemController = {
   async detalhar(req, res) {
     try {
@@ -238,9 +239,7 @@ const PostagemController = {
       const { tipo, pesquisa } = req.query;
 
       if (!pesquisa || !tipo) {
-        return res
-          .status(400)
-          .json({ msg: "📌 Digite o que deseja pesquisar!!" });
+        return res.status(400).json({ msg: "📌 Digite o que deseja pesquisar!!" });
       }
 
       let results = [];
@@ -256,12 +255,7 @@ const PostagemController = {
           },
           attributes: { exclude: ["senha"] },
         });
-        
-      } else if (
-        ["recado", "receita", "evento", "estabelecimento", "promocao"].includes(
-          tipo
-        )
-      ) {
+      } else if (["recado", "receita", "evento", "estabelecimento", "promocao"].includes(tipo)) {
         const filtros = {
           recado: [
             { conteudo: { [Op.like]: `%${pesquisa}%` } },
