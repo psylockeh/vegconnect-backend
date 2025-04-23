@@ -304,6 +304,43 @@ const PostagemController = {
         .json({ msg: "❌ Erro interno no servidor ao realizar a pesquisa!!" });
     }
   },
+
+  async deletarPerfil(req, res) {
+    try {
+      const { id } = req.params;
+
+      const usuario = await Usuario.findByPk(id);
+      if (!usuario) {
+        return res.status(404).json({ msg: "❌ Usuário não encontrado." });
+      }
+
+      await Postagem.destroy({ where: { usuario_id: id } });
+      await Usuario.destroy({ where: { id_user: id } });
+
+      return res.status(200).json({ msg: "📌 Usuário e postagens excluídos com sucesso." });
+    } catch (error) {
+      console.error("Erro ao deletar usuário:", error);
+      return res.status(500).json({ erro: "❌ Erro ao deletar usuário." });
+    }
+  },
+
+  async deletarPostagem(req, res) {
+    try {
+      const { id } = req.params;
+
+      const postagem = await Postagem.findByPk(id);
+      if (!postagem) {
+        return res.status(404).json({ msg: "❌ Postagem não encontrada." });
+      }
+
+      await Postagem.destroy({ where: { id } });
+
+      return res.status(200).json({ msg: "📌 Postagem excluída com sucesso." });
+    } catch (error) {
+      console.error("Erro ao deletar postagem:", error);
+      return res.status(500).json({ erro: "❌ Erro ao deletar postagem." });
+    }
+  }
 };
 
 module.exports = PostagemController;

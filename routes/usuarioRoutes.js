@@ -3,7 +3,7 @@ const { atualizarPerfil } = require("../controllers/usuarioController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getPerfil } = require("../controllers/usuarioController");
 const { criar } = require("../controllers/postagemController");
-const postagemController = require("../controllers/postagemController");
+const postagemController = require ("../controllers/postagemController");
 
 const router = express.Router();
 
@@ -26,5 +26,11 @@ router.get("/postagens/:id", postagemController.detalhar);
 
 //Pesquisa Geral(Perfil e Usuario)
 router.get("/pesquisaGeral", postagemController.pesquisaGeral);
+
+//Deletar Perfil
+router.delete("/deletarPerfil/:id", postagemController.deletarPerfil);
+
+//Deletar Postagem
+router.delete("/deletarPostagem/:id", postagemController.deletarPostagem);
 
 module.exports = router;
