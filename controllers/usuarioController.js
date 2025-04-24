@@ -1,4 +1,5 @@
 const { Usuario } = require("../models");
+const bcrypt = require("bcryptjs");
 
 exports.atualizarPerfil = async (req, res) => {
   const { id_user } = req.user;
@@ -8,6 +9,7 @@ exports.atualizarPerfil = async (req, res) => {
     nome,
     telefone,
     nickname,
+    senha,
     bio,
     data_nascimento,
     email,
@@ -52,6 +54,7 @@ exports.atualizarPerfil = async (req, res) => {
       nome,
       telefone,
       nickname,
+      senha,
       bio,
       data_nascimento,
       email,
@@ -69,6 +72,12 @@ exports.atualizarPerfil = async (req, res) => {
       matricula,
       pref_alim,
     };
+
+    if (senha) {
+      const salt = await bcrypt.genSalt(10);
+      const senhaHash = await bcrypt.hash(senha, salt);
+      camposParaAtualizar.senha = senhaHash;
+    }
 
     // Remove os campos com valor undefined
     Object.keys(camposParaAtualizar).forEach(
