@@ -7,7 +7,6 @@ module.exports = (sequelize) => {
     static associate(models) {
       Postagem.belongsTo(models.Usuario, {
         foreignKey: "usuario_id",
-        targetKey: "id_user",
         as: "autor",
       });
     }
@@ -56,6 +55,10 @@ module.exports = (sequelize) => {
       },
       categoria: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      descricao_resumida: {
+        type: DataTypes.TEXT,
         allowNull: true,
       },
       selo_confianca: {

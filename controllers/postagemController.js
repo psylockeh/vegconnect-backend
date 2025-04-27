@@ -19,6 +19,22 @@ const PostagemController = {
           "createdAt",
           "updatedAt",
           "midia_urls",
+          "nome_receita",
+          "ingredientes",
+          "instrucoes",
+          "temp_prep",
+          "data",
+          "localizacao",
+          "nome_comercio",
+          "descricao_comercio",
+          "tp_comida",
+          "hora_abertura",
+          "hora_fechamento",
+          "cep",
+          "endereco",
+          "valor",
+          "links",
+          "descricao_resumida",
         ],
         include: [
           {
@@ -34,6 +50,8 @@ const PostagemController = {
           },
         ],
       });
+
+      console.log("Resultado da busca por ID:", postagem);
 
       if (!postagem) {
         return res.status(404).json({ erro: "Postagem não encontrada." });
@@ -111,6 +129,7 @@ const PostagemController = {
         valor,
         links,
         midia_urls,
+        descricao_resumida,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -157,31 +176,82 @@ const PostagemController = {
         conteudo,
         categoria: categoria || null,
         tag: tag || null,
-        // selo_confianca: tp_user === "Chef",
+        selo_confianca: tp_user === "Chef",
         midia_urls: req.body.midia_urls || null,
+        descricao_resumida: descricao_resumida || null,
+        nome_receita: nome_receita || null,
+        ingredientes: ingredientes || null,
+        instrucoes: instrucoes || null,
+        temp_prep: temp_prep || null,
+        data: data || null,
+        localizacao: localizacao || null,
+        nome_comercio: nome_comercio || null,
+        descricao_comercio: descricao_comercio || null,
+        tp_comida: tp_comida || null,
+        selo_confianca: selo_confianca || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
       switch (tp_post) {
         case "receita":
-          if (!nome_receita || !ingredientes || !instrucoes || !temp_prep) {
+          if (
+            !nome_receita ||
+            !ingredientes ||
+            !instrucoes ||
+            !temp_prep ||
+            !midia_urls ||
+            !descricao_resumida
+          ) {
             return res
               .status(400)
               .json({ msg: "Todos os campos da receita são obrigatórios." });
           }
+          if (descricao_resumida.length > 200) {
+            return res.status(400).json({
+              message:
+                "O resumo da postagem deve ter no máximo 200 caracteres.",
+            });
+          }
+          if (descricao_resumida.length < 10) {
+            return res.status(400).json({
+              message:
+                "O resumo deve ter pelo menos 10 caracteres para atrair os usuários.",
+            });
+          }
+
           Object.assign(dadosBase, {
             nome_receita,
             ingredientes,
             instrucoes,
             temp_prep,
             midia_urls,
+            descricao_resumida,
           });
           break;
 
         case "evento":
-          if (valor === undefined || isNaN(valor) || !localizacao) {
+          if (
+            valor === undefined ||
+            isNaN(valor) ||
+            !localizacao ||
+            !descricao_resumida
+          ) {
             return res.status(400).json({
               msg: "Localização e valor numérico são obrigatórios para evento.",
+            });
+          }
+          if (descricao_resumida.length > 200) {
+            return res.status(400).json({
+              message:
+                "O resumo da postagem deve ter no máximo 200 caracteres.",
+            });
+          }
+          if (descricao_resumida.length < 10) {
+            return res.status(400).json({
+              message:
+                "O resumo deve ter pelo menos 10 caracteres para atrair os usuários.",
             });
           }
           Object.assign(dadosBase, {
@@ -190,6 +260,7 @@ const PostagemController = {
             valor,
             links,
             midia_urls,
+            descricao_resumida,
           });
           break;
 
@@ -201,10 +272,23 @@ const PostagemController = {
             !hora_abertura ||
             !hora_fechamento ||
             !cep ||
-            !endereco
+            !endereco ||
+            !descricao_resumida
           ) {
             return res.status(400).json({
               msg: "Todos os campos de estabelecimento são obrigatórios.",
+            });
+          }
+          if (descricao_resumida.length > 200) {
+            return res.status(400).json({
+              message:
+                "O resumo da postagem deve ter no máximo 200 caracteres.",
+            });
+          }
+          if (descricao_resumida.length < 10) {
+            return res.status(400).json({
+              message:
+                "O resumo deve ter pelo menos 10 caracteres para atrair os usuários.",
             });
           }
           Object.assign(dadosBase, {
@@ -216,6 +300,7 @@ const PostagemController = {
             cep,
             endereco,
             midia_urls,
+            descricao_resumida,
           });
           break;
       }
@@ -239,7 +324,9 @@ const PostagemController = {
       const { tipo, pesquisa } = req.query;
 
       if (!pesquisa || !tipo) {
-        return res.status(400).json({ msg: "📌 Digite o que deseja pesquisar!!" });
+        return res
+          .status(400)
+          .json({ msg: "📌 Digite o que deseja pesquisar!!" });
       }
 
       let results = [];
@@ -255,11 +342,13 @@ const PostagemController = {
           },
           attributes: { exclude: ["senha"] },
         });
-      } else if (["recado", "receita", "evento", "estabelecimento", "promocao"].includes(tipo)) {
+      } else if (
+        ["recado", "receita", "evento", "estabelecimento", "promocao"].includes(
+          tipo
+        )
+      ) {
         const filtros = {
-          recado: [
-            { conteudo: { [Op.like]: `%${pesquisa}%` } },
-          ],
+          recado: [{ conteudo: { [Op.like]: `%${pesquisa}%` } }],
           receita: [
             { nome_receita: { [Op.like]: `%${pesquisa}%` } },
             { ingredientes: { [Op.like]: `%${pesquisa}%` } },
@@ -317,7 +406,9 @@ const PostagemController = {
       await Postagem.destroy({ where: { usuario_id: id } });
       await Usuario.destroy({ where: { id_user: id } });
 
-      return res.status(200).json({ msg: "📌 Usuário e postagens excluídos com sucesso." });
+      return res
+        .status(200)
+        .json({ msg: "📌 Usuário e postagens excluídos com sucesso." });
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
       return res.status(500).json({ erro: "❌ Erro ao deletar usuário." });
@@ -340,7 +431,7 @@ const PostagemController = {
       console.error("Erro ao deletar postagem:", error);
       return res.status(500).json({ erro: "❌ Erro ao deletar postagem." });
     }
-  }
+  },
 };
 
 module.exports = PostagemController;
