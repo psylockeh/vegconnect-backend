@@ -80,6 +80,9 @@ const PostagemController = {
           "createdAt",
           "updatedAt",
           "midia_urls",
+          "calorias",
+          "dificuldade",
+          "rendimento",
         ],
         include: [
           {
@@ -130,6 +133,9 @@ const PostagemController = {
         links,
         midia_urls,
         descricao_resumida,
+        calorias,
+        dificuldade,
+        rendimento,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -191,6 +197,9 @@ const PostagemController = {
         selo_confianca: selo_confianca || null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        calorias: calorias || null,
+        dificuldade: dificuldade || null,
+        rendimento: rendimento || null,
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
@@ -228,6 +237,9 @@ const PostagemController = {
             temp_prep,
             midia_urls,
             descricao_resumida,
+            calorias,
+            dificuldade,
+            rendimento,
           });
           break;
 

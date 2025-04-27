@@ -100,6 +100,18 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      calorias: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      dificuldade: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      rendimento: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
 
       // Campos específicos de EVENTO
       data: {
