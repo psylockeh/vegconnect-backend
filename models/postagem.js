@@ -89,7 +89,7 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
       instrucoes: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSON,
         allowNull: true,
       },
       ingredientes: {
@@ -108,7 +108,11 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      rendimento: {
+      rendimento_quantidade: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tipo_rendimento: {
         type: DataTypes.STRING,
         allowNull: true,
       },
@@ -129,6 +133,25 @@ module.exports = (sequelize) => {
       links: {
         type: DataTypes.TEXT,
         allowNull: true,
+      },
+      tp_evento: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      categoria_evento: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      modalidade_evento: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        get() {
+          const raw = this.getDataValue("modalidade_evento");
+          return raw ? JSON.parse(raw) : [];
+        },
+        set(value) {
+          this.setDataValue("modalidade_evento", JSON.stringify(value));
+        },
       },
 
       // Campos específicos de COMÉRCIO
@@ -157,6 +180,18 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
       endereco: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tipo_comercio: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tipo_produto: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      tipo_serviço: {
         type: DataTypes.STRING,
         allowNull: true,
       },

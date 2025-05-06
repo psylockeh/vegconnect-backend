@@ -19,12 +19,27 @@ const PostagemController = {
           "createdAt",
           "updatedAt",
           "midia_urls",
+
+          // Receita
           "nome_receita",
           "ingredientes",
           "instrucoes",
           "temp_prep",
+          "calorias",
+          "dificuldade",
+          "rendimento_quantidade",
+          "tipo_rendimento",
+
+          // Evento
           "data",
           "localizacao",
+          "valor",
+          "links",
+          "tp_evento",
+          "categoria_evento",
+          "modalidade_evento",
+
+          // Estabelecimento
           "nome_comercio",
           "descricao_comercio",
           "tp_comida",
@@ -32,10 +47,11 @@ const PostagemController = {
           "hora_fechamento",
           "cep",
           "endereco",
-          "valor",
-          "links",
+
+          // Comum
           "descricao_resumida",
         ],
+
         include: [
           {
             model: Usuario,
@@ -82,7 +98,9 @@ const PostagemController = {
           "midia_urls",
           "calorias",
           "dificuldade",
-          "rendimento",
+          "rendimento_quantidade",
+          "tipo_rendimento",
+          "descricao_resumida",
         ],
         include: [
           {
@@ -135,7 +153,8 @@ const PostagemController = {
         descricao_resumida,
         calorias,
         dificuldade,
-        rendimento,
+        tipo_rendimento,
+        rendimento_quantidade,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -194,17 +213,18 @@ const PostagemController = {
         nome_comercio: nome_comercio || null,
         descricao_comercio: descricao_comercio || null,
         tp_comida: tp_comida || null,
-        selo_confianca: selo_confianca || null,
         createdAt: new Date(),
         updatedAt: new Date(),
         calorias: calorias || null,
         dificuldade: dificuldade || null,
-        rendimento: rendimento || null,
+        rendimento_quantidade: rendimento_quantidade || null,
+        tipo_rendimento: tipo_rendimento || null,
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
+      // trecho atualizado do switch(tp_post) com validações completas
       switch (tp_post) {
-        case "receita":
+        case "receita": {
           if (
             !nome_receita ||
             !ingredientes ||
@@ -217,66 +237,83 @@ const PostagemController = {
               .status(400)
               .json({ msg: "Todos os campos da receita são obrigatórios." });
           }
-          if (descricao_resumida.length > 200) {
+          if (
+            descricao_resumida.length > 200 ||
+            descricao_resumida.length < 10
+          ) {
             return res.status(400).json({
-              message:
-                "O resumo da postagem deve ter no máximo 200 caracteres.",
+              msg: "O resumo da receita deve ter entre 10 e 200 caracteres.",
             });
           }
-          if (descricao_resumida.length < 10) {
-            return res.status(400).json({
-              message:
-                "O resumo deve ter pelo menos 10 caracteres para atrair os usuários.",
-            });
+          if (!Array.isArray(JSON.parse(categoria || "[]"))) {
+            return res
+              .status(400)
+              .json({ msg: "Categoria da receita deve ser uma lista." });
           }
-
           Object.assign(dadosBase, {
-            nome_receita,
+            nome_receita: nome_receita.trim(),
             ingredientes,
             instrucoes,
             temp_prep,
             midia_urls,
-            descricao_resumida,
+            descricao_resumida: descricao_resumida.trim(),
             calorias,
             dificuldade,
-            rendimento,
+            tipo_rendimento,
+            rendimento_quantidade,
+            categoria,
           });
           break;
+        }
 
-        case "evento":
+        case "evento": {
           if (
-            valor === undefined ||
-            isNaN(valor) ||
             !localizacao ||
-            !descricao_resumida
+            !valor ||
+            !descricao_resumida ||
+            !tp_evento ||
+            !categoria_evento ||
+            !modalidade_evento
           ) {
             return res.status(400).json({
-              msg: "Localização e valor numérico são obrigatórios para evento.",
+              msg: "Todos os campos obrigatórios do evento devem ser preenchidos.",
             });
           }
-          if (descricao_resumida.length > 200) {
+          if (
+            descricao_resumida.length > 200 ||
+            descricao_resumida.length < 10
+          ) {
             return res.status(400).json({
-              message:
-                "O resumo da postagem deve ter no máximo 200 caracteres.",
+              msg: "O resumo do evento deve ter entre 10 e 200 caracteres.",
             });
           }
-          if (descricao_resumida.length < 10) {
-            return res.status(400).json({
-              message:
-                "O resumo deve ter pelo menos 10 caracteres para atrair os usuários.",
-            });
+          let modalidades;
+          try {
+            modalidades = JSON.parse(modalidade_evento);
+            if (!Array.isArray(modalidades) || modalidades.length === 0) {
+              return res.status(400).json({
+                msg: "Pelo menos uma modalidade do evento deve ser selecionada.",
+              });
+            }
+          } catch {
+            return res
+              .status(400)
+              .json({ msg: "Modalidade do evento deve ser um array válido." });
           }
           Object.assign(dadosBase, {
             data,
-            localizacao,
+            localizacao: localizacao.trim(),
             valor,
             links,
-            midia_urls,
-            descricao_resumida,
+            descricao_resumida: descricao_resumida.trim(),
+            tp_evento,
+            categoria_evento,
+            modalidade_evento: JSON.stringify(modalidades),
           });
           break;
+        }
 
-        case "estabelecimento":
+        case "estabelecimento": {
           if (
             !nome_comercio ||
             !descricao_comercio ||
@@ -291,33 +328,65 @@ const PostagemController = {
               msg: "Todos os campos de estabelecimento são obrigatórios.",
             });
           }
-          if (descricao_resumida.length > 200) {
+          if (
+            descricao_resumida.length > 200 ||
+            descricao_resumida.length < 10
+          ) {
             return res.status(400).json({
-              message:
-                "O resumo da postagem deve ter no máximo 200 caracteres.",
-            });
-          }
-          if (descricao_resumida.length < 10) {
-            return res.status(400).json({
-              message:
-                "O resumo deve ter pelo menos 10 caracteres para atrair os usuários.",
+              msg: "O resumo do estabelecimento deve ter entre 10 e 200 caracteres.",
             });
           }
           Object.assign(dadosBase, {
-            nome_comercio,
-            descricao_comercio,
+            nome_comercio: nome_comercio.trim(),
+            descricao_comercio: descricao_comercio.trim(),
             tp_comida,
             hora_abertura,
             hora_fechamento,
             cep,
             endereco,
-            midia_urls,
-            descricao_resumida,
+            descricao_resumida: descricao_resumida.trim(),
           });
           break;
-      }
-      if (req.body.midia_urls) {
-        dadosBase.midia_urls = req.body.midia_urls;
+        }
+
+        case "promocao": {
+          if (!titulo || !conteudo || !data || !links || !descricao_resumida) {
+            return res
+              .status(400)
+              .json({ msg: "Todos os campos da promoção são obrigatórios." });
+          }
+          if (
+            descricao_resumida.length > 200 ||
+            descricao_resumida.length < 10
+          ) {
+            return res.status(400).json({
+              msg: "O resumo da promoção deve ter entre 10 e 200 caracteres.",
+            });
+          }
+          Object.assign(dadosBase, {
+            titulo: titulo.trim(),
+            conteudo: conteudo.trim(),
+            data,
+            links,
+            descricao_resumida: descricao_resumida.trim(),
+          });
+          break;
+        }
+
+        case "recado": {
+          if (!conteudo || conteudo.trim().length < 5) {
+            return res
+              .status(400)
+              .json({ msg: "O recado deve ter pelo menos 5 caracteres." });
+          }
+          Object.assign(dadosBase, {
+            conteudo: conteudo.trim(),
+          });
+          break;
+        }
+
+        default:
+          return res.status(400).json({ msg: "Tipo de postagem inválido." });
       }
 
       // 4. Criar postagem
