@@ -104,7 +104,7 @@ exports.atualizarPerfil = async (req, res) => {
 };
 
 exports.getPerfil = async (req, res) => {
-  const { id_user } = req.user;
+  const id_user = req.params.id_user || req.user.id_user;
 
   try {
     const usuario = await Usuario.findByPk(id_user, {

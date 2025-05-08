@@ -15,6 +15,8 @@ router.put("/perfil", authMiddleware, atualizarPerfil);
 // busca perfil do usuário
 router.get("/perfil", authMiddleware, getPerfil);
 
+router.get("/perfil/:id_user", authMiddleware, getPerfil);
+
 // cria postagem
 router.post("/postagens", authMiddleware, criar);
 
