@@ -433,21 +433,21 @@ const PostagemController = {
           receita: [
             { nome_receita: { [Op.like]: `%${pesquisa}%` } },
             { ingredientes: { [Op.like]: `%${pesquisa}%` } },
-            { instrucoes: { [Op.like]: `%${pesquisa}%` } },
+            { dificuldade: { [Op.like]: `%${pesquisa}%` } },
           ],
           evento: [
             { titulo: { [Op.like]: `%${pesquisa}%` } },
             { localizacao: { [Op.like]: `%${pesquisa}%` } },
-            { descricao: { [Op.like]: `%${pesquisa}%` } },
+            { tp_evento: { [Op.like]: `%${pesquisa}%` } },
           ],
           estabelecimento: [
             { nome_comercio: { [Op.like]: `%${pesquisa}%` } },
-            { descricao_comercio: { [Op.like]: `%${pesquisa}%` } },
+            { endereco: { [Op.like]: `%${pesquisa}%` } },
             { tp_comida: { [Op.like]: `%${pesquisa}%` } },
           ],
           promocao: [
             { titulo: { [Op.like]: `%${pesquisa}%` } },
-            { descricao: { [Op.like]: `%${pesquisa}%` } },
+            { descricao_resumida: { [Op.like]: `%${pesquisa}%` } },
             { nome_comercio: { [Op.like]: `%${pesquisa}%` } },
           ],
         };
@@ -456,7 +456,13 @@ const PostagemController = {
           where: {
             tp_post: tipo,
             [Op.or]: filtros[tipo],
-          },
+          },include: [
+            {
+              model: Usuario,
+              as: "autor",
+              attributes: ["id_user", "nome", "tp_user", "foto_perfil", "nickname"],
+            },
+          ],
         });
       } else {
         return res.status(400).json({ msg: "❌ Erro ao realizar pesquisa!!" });
