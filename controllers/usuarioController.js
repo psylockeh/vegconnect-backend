@@ -1,5 +1,6 @@
 const { Usuario } = require("../models");
 const bcrypt = require("bcryptjs");
+const { Op } = require("sequelize");
 
 exports.atualizarPerfil = async (req, res) => {
   const { id_user } = req.user;
@@ -50,6 +51,32 @@ exports.atualizarPerfil = async (req, res) => {
       }
     }
 
+    if (nickname) {
+      const jaExiste = await Usuario.findOne({
+        where: {
+          nickname,
+          id_user: { [Op.ne]: req.user.id_user },
+        },
+      });
+
+      if (jaExiste) {
+        return res.status(400).json({ erro: "Nickname já está em uso." });
+      }
+    }
+
+    if (email) {
+      const emailExiste = await Usuario.findOne({
+        where: {
+          email,
+          id_user: { [Op.ne]: req.user.id_user },
+        },
+      });
+
+      if (emailExiste) {
+        return res.status(400).json({ erro: "E-mail já está em uso." });
+      }
+    }
+
     const camposParaAtualizar = {
       nome,
       telefone,
@@ -83,7 +110,7 @@ exports.atualizarPerfil = async (req, res) => {
     Object.keys(camposParaAtualizar).forEach(
       (key) =>
         camposParaAtualizar[key] === undefined &&
-        delete camposParaAtualizar[key],
+        delete camposParaAtualizar[key]
     );
 
     console.log("📥 Campos para update:", camposParaAtualizar);
