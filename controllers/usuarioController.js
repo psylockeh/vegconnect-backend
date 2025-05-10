@@ -99,6 +99,13 @@ exports.atualizarPerfil = async (req, res) => {
       matricula,
       pref_alim,
     };
+    if (
+      !camposParaAtualizar.foto_perfil ||
+      camposParaAtualizar.foto_perfil === "null"
+    ) {
+      camposParaAtualizar.foto_perfil =
+        "https://res.cloudinary.com/dyhzz5baz/image/upload/v1746917561/default-avatar_jvqpsg.png";
+    }
 
     if (senha) {
       const salt = await bcrypt.genSalt(10);
