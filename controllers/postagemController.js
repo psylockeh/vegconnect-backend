@@ -155,6 +155,11 @@ const PostagemController = {
         dificuldade,
         tipo_rendimento,
         rendimento_quantidade,
+        tp_evento,
+        categoria_evento,
+        modalidade_evento,
+        data_evento,
+        localizacao_evento,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
@@ -204,21 +209,8 @@ const PostagemController = {
         selo_confianca: tp_user === "Chef",
         midia_urls: req.body.midia_urls || null,
         descricao_resumida: descricao_resumida || null,
-        nome_receita: nome_receita || null,
-        ingredientes: ingredientes || null,
-        instrucoes: instrucoes || null,
-        temp_prep: temp_prep || null,
-        data: data || null,
-        localizacao: localizacao || null,
-        nome_comercio: nome_comercio || null,
-        descricao_comercio: descricao_comercio || null,
-        tp_comida: tp_comida || null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        calorias: calorias || null,
-        dificuldade: dificuldade || null,
-        rendimento_quantidade: rendimento_quantidade || null,
-        tipo_rendimento: tipo_rendimento || null,
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
@@ -279,6 +271,7 @@ const PostagemController = {
               msg: "Todos os campos obrigatórios do evento devem ser preenchidos.",
             });
           }
+
           if (
             descricao_resumida.length > 200 ||
             descricao_resumida.length < 10
@@ -287,10 +280,18 @@ const PostagemController = {
               msg: "O resumo do evento deve ter entre 10 e 200 caracteres.",
             });
           }
+
           let modalidades;
           try {
-            modalidades = JSON.parse(modalidade_evento);
-            if (!Array.isArray(modalidades) || modalidades.length === 0) {
+            if (typeof modalidade_evento === "string") {
+              modalidades = [modalidade_evento];
+            } else if (Array.isArray(modalidade_evento)) {
+              modalidades = modalidade_evento;
+            } else {
+              throw new Error();
+            }
+
+            if (modalidades.length === 0) {
               return res.status(400).json({
                 msg: "Pelo menos uma modalidade do evento deve ser selecionada.",
               });
@@ -300,6 +301,7 @@ const PostagemController = {
               .status(400)
               .json({ msg: "Modalidade do evento deve ser um array válido." });
           }
+
           Object.assign(dadosBase, {
             data,
             localizacao: localizacao.trim(),
@@ -310,42 +312,52 @@ const PostagemController = {
             categoria_evento,
             modalidade_evento: JSON.stringify(modalidades),
           });
+
           break;
         }
-
         case "estabelecimento": {
+          if (!tipo_comercio) {
+            return res.status(400).json({ msg: "Informe o tipo de comércio." });
+          }
+
+          const obrigatorios = {
+            restaurante: [tp_comida, hora_abertura, hora_fechamento],
+            feira: [tp_comida],
+            loja: [tipo_produto],
+            servico: [tipo_servico],
+          };
+
+          const campos = obrigatorios[tipo_comercio] || [];
+
+          const faltando = campos.some((c) => !c || c === "");
+
           if (
-            !nome_comercio ||
-            !descricao_comercio ||
-            !tp_comida ||
-            !hora_abertura ||
-            !hora_fechamento ||
-            !cep ||
-            !endereco ||
-            !descricao_resumida
+            !titulo?.trim() ||
+            !conteudo?.trim() ||
+            !descricao_resumida?.trim() ||
+            !cep?.trim() ||
+            !endereco?.trim() ||
+            faltando
           ) {
             return res.status(400).json({
-              msg: "Todos os campos de estabelecimento são obrigatórios.",
+              msg: "Preencha todos os campos obrigatórios conforme o tipo de comércio.",
             });
           }
-          if (
-            descricao_resumida.length > 200 ||
-            descricao_resumida.length < 10
-          ) {
-            return res.status(400).json({
-              msg: "O resumo do estabelecimento deve ter entre 10 e 200 caracteres.",
-            });
-          }
+
           Object.assign(dadosBase, {
-            nome_comercio: nome_comercio.trim(),
-            descricao_comercio: descricao_comercio.trim(),
+            tipo_comercio,
+            tipo_produto,
+            tipo_servico,
             tp_comida,
             hora_abertura,
             hora_fechamento,
             cep,
             endereco,
-            descricao_resumida: descricao_resumida.trim(),
+            descricao_comercio,
+            descricao_resumida,
+            nome_comercio: titulo,
           });
+
           break;
         }
 
@@ -456,11 +468,18 @@ const PostagemController = {
           where: {
             tp_post: tipo,
             [Op.or]: filtros[tipo],
-          },include: [
+          },
+          include: [
             {
               model: Usuario,
               as: "autor",
-              attributes: ["id_user", "nome", "tp_user", "foto_perfil", "nickname"],
+              attributes: [
+                "id_user",
+                "nome",
+                "tp_user",
+                "foto_perfil",
+                "nickname",
+              ],
             },
           ],
         });
