@@ -161,6 +161,9 @@ const PostagemController = {
         modalidade_evento,
         data_evento,
         localizacao_evento,
+        tipo_comercio,
+        tipo_produto,
+        tipo_servico,
       } = req.body;
 
       const { id_user, tp_user } = req.user;
