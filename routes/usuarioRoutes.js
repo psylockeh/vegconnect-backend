@@ -3,7 +3,7 @@ const { atualizarPerfil } = require("../controllers/usuarioController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getPerfil } = require("../controllers/usuarioController");
 const { criar } = require("../controllers/postagemController");
-const postagemController = require ("../controllers/postagemController");
+const postagemController = require("../controllers/postagemController");
 
 const router = express.Router();
 
@@ -34,5 +34,7 @@ router.delete("/deletarPerfil/:id", postagemController.deletarPerfil);
 
 //Deletar Postagem
 router.delete("/deletarPostagem/:id", postagemController.deletarPostagem);
+
+router.get("/estabelecimentos", postagemController.buscarEstabelecimentos);
 
 module.exports = router;

@@ -550,6 +550,34 @@ const PostagemController = {
       return res.status(500).json({ erro: "❌ Erro ao deletar postagem." });
     }
   },
+
+  async buscarEstabelecimentos(req, res) {
+    try {
+      const { lat, lng } = req.query;
+
+      const estabelecimentos = await Postagem.findAll({
+        where: {
+          tp_post: "estabelecimento",
+          latitude: { [Op.not]: null },
+          longitude: { [Op.not]: null },
+        },
+        attributes: [
+          "id",
+          "nome_comercio",
+          "descricao_comercio",
+          "latitude",
+          "longitude",
+          "tipo_comercio",
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      return res.status(200).json(estabelecimentos);
+    } catch (error) {
+      console.error("Erro ao buscar estabelecimentos:", error);
+      return res.status(500).json({ erro: "Erro ao buscar estabelecimentos." });
+    }
+  },
 };
 
 module.exports = PostagemController;
