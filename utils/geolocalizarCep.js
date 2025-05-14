@@ -1,17 +1,37 @@
 const axios = require("axios");
 
 async function geolocalizarCep(cep) {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${cep}&region=br&key=${apiKey}`;
+  try {
+    const viacep = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+    const { logradouro, bairro, localidade, uf } = viacep.data;
 
-  const { data } = await axios.get(url);
+    const enderecoCompleto = `${logradouro}, ${bairro}, ${localidade}, ${uf}`;
 
-  if (data.status !== "OK" || !data.results.length) {
+    const nominatim = await axios.get(
+      "https://nominatim.openstreetmap.org/search",
+      {
+        params: {
+          q: enderecoCompleto,
+          format: "json",
+          addressdetails: 1,
+          limit: 1,
+        },
+        headers: {
+          "User-Agent": "VegConnect/1.0",
+        },
+      }
+    );
+
+    if (!nominatim.data[0]) {
+      throw new Error("Não foi possível localizar o CEP.");
+    }
+
+    const { lat, lon } = nominatim.data[0];
+    return { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+  } catch (error) {
+    console.error("Erro ao geolocalizar:", error.message);
     throw new Error("Não foi possível localizar o CEP.");
   }
-
-  const { lat, lng } = data.results[0].geometry.location;
-  return { latitude: lat, longitude: lng };
 }
 
 module.exports = geolocalizarCep;
