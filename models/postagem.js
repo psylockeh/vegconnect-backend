@@ -191,7 +191,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      tipo_serviço: {
+      tipo_servico: {
         type: DataTypes.STRING,
         allowNull: true,
       },
