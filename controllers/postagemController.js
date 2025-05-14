@@ -1,5 +1,6 @@
 const { Postagem, Usuario } = require("../models");
 const { Op } = require("sequelize");
+const geolocalizarCep = require("../utils/geolocalizarCep");
 
 const PostagemController = {
   async detalhar(req, res) {
@@ -316,6 +317,15 @@ const PostagemController = {
           break;
         }
         case "estabelecimento": {
+          if (tp_post === "estabelecimento" && cep) {
+            try {
+              const { latitude, longitude } = await geolocalizarCep(cep);
+              Object.assign(dadosBase, { latitude, longitude });
+            } catch (err) {
+              console.warn("Erro ao geolocalizar CEP:", err.message);
+            }
+          }
+
           if (!tipo_comercio) {
             return res.status(400).json({ msg: "Informe o tipo de comércio." });
           }
@@ -328,7 +338,6 @@ const PostagemController = {
           };
 
           const campos = obrigatorios[tipo_comercio] || [];
-
           const faltando = campos.some((c) => !c || c === "");
 
           if (
