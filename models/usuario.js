@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
       //comum
       pref_alim: {
         type: DataTypes.ENUM("Vegano", "Vegetariano", "Dieta restritiva"),
-        allowNull: false,
+        allowNull: true,
       },
       reset_token: {
         type: DataTypes.STRING,
@@ -125,7 +125,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "Usuario",
       tableName: "usuario",
-    },
+    }
   );
 
   return Usuario;

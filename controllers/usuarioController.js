@@ -147,6 +147,8 @@ exports.getPerfil = async (req, res) => {
       },
     });
 
+    return res.status(200).json(usuario);
+
     if (!usuario) {
       return res.status(404).json({ msg: "Usuário não encontrado" });
     }
