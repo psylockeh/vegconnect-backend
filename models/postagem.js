@@ -66,6 +66,18 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: true,
       },
+      descricao_teste: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      evidencias_urls: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+      aprovador_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       tag: {
         type: DataTypes.STRING,
         allowNull: true,

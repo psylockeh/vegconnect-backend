@@ -37,4 +37,10 @@ router.delete("/deletarPostagem/:id", postagemController.deletarPostagem);
 
 router.get("/estabelecimentos", postagemController.buscarEstabelecimentos);
 
+router.post(
+  "/receitas/:id/selo-confianca",
+  authMiddleware,
+  postagemController.atribuirSelo
+);
+
 module.exports = router;

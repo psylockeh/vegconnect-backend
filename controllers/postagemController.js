@@ -258,7 +258,9 @@ const PostagemController = {
             tipo_rendimento,
             rendimento_quantidade,
             categoria,
+            selo_confianca: tp_user === "Chef",
           });
+
           break;
         }
 
@@ -576,6 +578,62 @@ const PostagemController = {
     } catch (error) {
       console.error("Erro ao buscar estabelecimentos:", error);
       return res.status(500).json({ erro: "Erro ao buscar estabelecimentos." });
+    }
+  },
+
+  async atribuirSelo(req, res) {
+    const { id } = req.params;
+    const { id_user, tp_user } = req.user;
+    const { descricao_teste, evidencias_urls, aprovado } = req.body;
+
+    if (tp_user !== "Chef") {
+      return res
+        .status(403)
+        .json({ msg: "Apenas chefs podem validar receitas." });
+    }
+
+    const receita = await Postagem.findByPk(id);
+    if (!receita || receita.tp_post !== "receita") {
+      return res.status(404).json({ msg: "Receita não encontrada." });
+    }
+
+    if (receita.selo_confianca) {
+      return res
+        .status(400)
+        .json({ msg: "Essa receita já possui selo de confiança." });
+    }
+
+    if (
+      !descricao_teste?.trim() ||
+      !Array.isArray(evidencias_urls) ||
+      typeof aprovado !== "boolean"
+    ) {
+      return res
+        .status(400)
+        .json({ msg: "Preencha todos os campos obrigatórios do formulário." });
+    }
+
+    if (!aprovado) {
+      return res
+        .status(200)
+        .json({ msg: "Receita não aprovada. Nenhuma alteração feita." });
+    }
+
+    try {
+      receita.selo_confianca = true;
+      receita.descricao_teste = descricao_teste;
+      receita.evidencias_urls = evidencias_urls;
+      receita.aprovador_id = id_user;
+      await receita.save();
+
+      return res
+        .status(200)
+        .json({ msg: "Selo de confiança atribuído com sucesso!" });
+    } catch (error) {
+      console.error("Erro ao atribuir selo:", error);
+      return res
+        .status(500)
+        .json({ msg: "Erro interno ao atribuir selo de confiança." });
     }
   },
 };
