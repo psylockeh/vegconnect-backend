@@ -120,6 +120,11 @@ const PostagemController = {
               "nickname",
             ],
           },
+          {
+            model: Usuario,
+            as: "verificado_por",
+            attributes: ["id_user", "nome", "nickname", "foto_perfil"],
+          },
         ],
       });
 
