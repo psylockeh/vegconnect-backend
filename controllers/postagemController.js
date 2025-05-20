@@ -65,6 +65,11 @@ const PostagemController = {
               "nickname",
             ],
           },
+          {
+            model: Usuario,
+            as: "verificado_por",
+            attributes: ["id_user", "nome", "nickname", "foto_perfil"],
+          },
         ],
       });
 
@@ -218,7 +223,6 @@ const PostagemController = {
       };
 
       // 3. Preenchimento condicional conforme o tipo da postagem
-      // trecho atualizado do switch(tp_post) com validações completas
       switch (tp_post) {
         case "receita": {
           if (
@@ -624,6 +628,7 @@ const PostagemController = {
       receita.descricao_teste = descricao_teste;
       receita.evidencias_urls = evidencias_urls;
       receita.aprovador_id = id_user;
+      receita.verificado_por_id = id_user;
       await receita.save();
 
       return res

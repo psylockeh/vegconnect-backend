@@ -5,9 +5,16 @@ const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   class Postagem extends Model {
     static associate(models) {
+      // Relação com o autor da postagem
       Postagem.belongsTo(models.Usuario, {
         foreignKey: "usuario_id",
         as: "autor",
+      });
+
+      // Relação com o chef que validou a receita
+      Postagem.belongsTo(models.Usuario, {
+        foreignKey: "verificado_por_id",
+        as: "verificado_por",
       });
     }
   }
@@ -127,6 +134,14 @@ module.exports = (sequelize) => {
       tipo_rendimento: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      verificado_por_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "usuario",
+          key: "id_user",
+        },
       },
 
       // Campos específicos de EVENTO
