@@ -3,8 +3,6 @@
 
 # Arquivos de ambiente e configuração
 .env
-.env.*
-config/*.env
 config/*.json
 
 # Logs
