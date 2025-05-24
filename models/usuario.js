@@ -4,6 +4,22 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     static associate(models) {
+
+      // Favoritos
+      Usuario.hasMany(models.ListaFavorito, {
+        foreignKey: "usuario_id",
+        as: "listasFavoritos", 
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
+      Usuario.hasMany(models.Favorito, {
+        foreignKey: "usuario_id",
+        as: "favoritos",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
       Usuario.hasOne(models.UsuarioChef, { foreignKey: "id_user_chef" });
       Usuario.hasOne(models.UsuarioComerciante, {
         foreignKey: "id_user_comerciante",

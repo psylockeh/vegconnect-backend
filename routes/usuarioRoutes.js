@@ -37,10 +37,21 @@ router.delete("/deletarPostagem/:id", postagemController.deletarPostagem);
 
 router.get("/estabelecimentos", postagemController.buscarEstabelecimentos);
 
-router.post(
-  "/receitas/:id/selo-confianca",
-  authMiddleware,
-  postagemController.atribuirSelo
-);
+router.post("/receitas/:id/selo-confianca", authMiddleware, postagemController.atribuirSelo);
+
+// Favoritar postagem
+router.post("/favoritos", postagemController.favoritar);
+
+// Desfavoritar postagem
+router.delete("/favoritos", postagemController.desfavoritar);
+
+//Listar as postagem 
+router.get("/favoritos", postagemController.listarFavoritos);
+
+//Criar lista de favorito
+router.post("/favoritos/lista", postagemController.criarListaFavoritos);
+
+//Listar as listas criadas
+router.get("/favoritos/listas", postagemController.listarListasFavoritos);
 
 module.exports = router;

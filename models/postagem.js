@@ -16,6 +16,14 @@ module.exports = (sequelize) => {
         foreignKey: "verificado_por_id",
         as: "verificado_por",
       });
+
+      // Favorito
+      Postagem.hasMany(models.Favorito, {
+        foreignKey: "postagem_id",
+        as: "favoritos", // ✅ Alias adicionado
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
     }
   }
 
