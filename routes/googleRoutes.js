@@ -6,10 +6,8 @@ router.get("/google/places", async (req, res) => {
   const { lat, lng, termo = "vegan restaurant" } = req.query;
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_KEY;
 
-  if (!lat || !lng) {
-    return res
-      .status(400)
-      .json({ erro: "Latitude e longitude são obrigatórias." });
+  if (!lat || !lng || !apiKey) {
+    return res.status(400).json({ erro: "Parâmetros obrigatórios ausentes." });
   }
 
   try {
