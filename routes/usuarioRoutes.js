@@ -26,6 +26,9 @@ router.get("/postagens", postagemController.listar);
 // busca postagem por id
 router.get("/postagens/:id", postagemController.detalhar);
 
+// Listar postagens de cada usuário no perfil
+router.get("/:id_user/postagens", postagemController.listarPostagensDoUsuario);
+
 //Pesquisa Geral(Perfil e Usuario)
 router.get("/pesquisaGeral", postagemController.pesquisaGeral);
 
@@ -57,5 +60,11 @@ router.post("/listas", postagemController.criarListaFavoritos);
 
 //Listar as listas criadas
 router.get("/listas", postagemController.listarListasFavoritos);
+
+//Editar o nome da lista
+router.put("/listas/:lista_id", postagemController.editarListaFavoritos);
+
+//Excluir lista de favorito e conteúdo
+router.delete("/listas/:lista_id", postagemController.excluirListaFavoritos);
 
 module.exports = router;

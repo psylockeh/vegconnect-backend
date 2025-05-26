@@ -434,6 +434,27 @@ const PostagemController = {
     }
   },
 
+  // Listar postagens de cada usuário no perfil
+  async listarPostagensDoUsuario(req, res) {
+    try {
+      const { id_user } = req.params;
+
+      const postagens = await Postagem.findAll({
+        where: { usuario_id: id_user },
+        order: [["createdAt", "DESC"]],
+      });
+
+      if (!postagens.length) {
+        return res.status(404).json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
+      }
+
+      return res.status(200).json(postagens);
+    } catch (error) {
+      console.error("Erro ao buscar postagens do usuário:", error);
+      return res.status(500).json({ erro: "Erro ao buscar postagens do usuário." });
+    }
+  },
+
   //Pesquisa Geral(Perfil e Usuario)
   async pesquisaGeral(req, res) {
     try {
@@ -648,7 +669,7 @@ const PostagemController = {
   },
 
 
-    // Criar lista de favoritos
+  // Criar lista de favoritos
   async criarListaFavoritos(req, res) {
     try {
       const { nome } = req.body;
@@ -744,6 +765,59 @@ const PostagemController = {
     } catch (error) {
       console.error("Erro ao listar favoritos:", error);
       return res.status(500).json({ erro: "Erro ao buscar favoritos." });
+    }
+  },
+
+  // Editar nome da lista de favoritos
+  async editarListaFavoritos(req, res) {
+    try {
+      const usuario_id = req.user.id_user;
+      const { lista_id } = req.params;
+      const { novo_nome } = req.body;
+
+      if (!novo_nome || novo_nome.trim() === "") {
+        return res.status(400).json({ erro: "O novo nome da lista é obrigatório." });
+      }
+
+      const lista = await ListaFavorito.findOne({
+        where: { id: lista_id, usuario_id },
+      });
+
+      if (!lista) {
+        return res.status(404).json({ erro: "Lista não encontrada." });
+      }
+
+      lista.nome = novo_nome.trim();
+      await lista.save();
+
+      return res.status(200).json({ msg: "Nome da lista atualizado com sucesso.", lista });
+    } catch (error) {
+      console.error("Erro ao editar lista:", error);
+      return res.status(500).json({ erro: "Erro ao editar nome da lista de favoritos." });
+    }
+  },
+
+  // Excluir lista de favoritos e os favoritos relacionados
+  async excluirListaFavoritos(req, res) {
+    try {
+      const usuario_id = req.user.id_user;
+      const { lista_id } = req.params;
+
+      const lista = await ListaFavorito.findOne({
+        where: { id: lista_id, usuario_id },
+      });
+
+      if (!lista) {
+        return res.status(404).json({ erro: "Lista não encontrada." });
+      }
+
+      await Favorito.destroy({ where: { lista_id } });
+      await ListaFavorito.destroy({ where: { id: lista_id } });
+
+      return res.status(200).json({ msg: "Lista e favoritos da lista excluídos com sucesso." });
+    } catch (error) {
+      console.error("Erro ao excluir lista:", error);
+      return res.status(500).json({ erro: "Erro ao excluir lista de favoritos." });
     }
   },
 };
