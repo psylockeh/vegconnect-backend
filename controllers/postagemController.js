@@ -1,4 +1,4 @@
-const { Postagem, Usuario } = require("../models");
+const { Postagem, Usuario, ListaFavorito, Favorito } = require("../models");
 const { Op } = require("sequelize");
 const geolocalizarCep = require("../utils/geolocalizarCep");
 
@@ -648,7 +648,7 @@ const PostagemController = {
   },
 
 
-   // Criar lista de favoritos
+    // Criar lista de favoritos
   async criarListaFavoritos(req, res) {
     try {
       const { nome } = req.body;
@@ -683,17 +683,19 @@ const PostagemController = {
   async favoritar(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagem_id, lista_id } = req.body;
+      const { postagem_id } = req.params;
+      const { lista_id } = req.body;
 
       const jaExiste = await Favorito.findOne({
         where: { usuario_id, postagem_id },
       });
 
       if (jaExiste) {
-        return res.status(400).json({ erro: "Já favoritada." });
+        return res.status(400).json({ erro: "Postagem já favoritada." });
       }
 
       const favorito = await Favorito.create({ usuario_id, postagem_id, lista_id });
+
       return res.status(201).json(favorito);
     } catch (error) {
       console.error("Erro ao favoritar:", error);
@@ -705,7 +707,7 @@ const PostagemController = {
   async desfavoritar(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagem_id } = req.body;
+      const { postagem_id } = req.params;
 
       const removido = await Favorito.destroy({
         where: { usuario_id, postagem_id },

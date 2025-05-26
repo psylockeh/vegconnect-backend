@@ -44,18 +44,18 @@ router.post(
 );
 
 // Favoritar postagem
-router.post("/favoritos", postagemController.favoritar);
+router.post("/listas/:lista_id/postagens/:postagem_id",  postagemController.favoritar);
 
 // Desfavoritar postagem
-router.delete("/favoritos", postagemController.desfavoritar);
+router.delete("/listas/:lista_id/postagens/:postagem_id", postagemController.desfavoritar);
 
-//Listar as postagem
-router.get("/favoritos", postagemController.listarFavoritos);
+//Listar as postagens dentro de uma lista específica
+router.get("/listas/:lista_id", postagemController.listarFavoritos);
 
 //Criar lista de favorito
-router.post("/favoritos/lista", postagemController.criarListaFavoritos);
+router.post("/listas", postagemController.criarListaFavoritos);
 
 //Listar as listas criadas
-router.get("/favoritos/listas", postagemController.listarListasFavoritos);
+router.get("/listas", postagemController.listarListasFavoritos);
 
 module.exports = router;
