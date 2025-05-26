@@ -3,6 +3,8 @@ const axios = require("axios");
 const router = express.Router();
 
 router.get("/google/places", async (req, res) => {
+  console.log("📍 Rota /externo/google/places acessada com:", req.query);
+
   const { lat, lng, termo = "vegan restaurant" } = req.query;
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
