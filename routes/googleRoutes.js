@@ -2,11 +2,9 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 
-router.get("/google/places", async (req, res) => {
-  console.log("📍 Rota /externo/google/places acessada com:", req.query);
-
+router.get("/places", async (req, res) => {
   const { lat, lng, termo = "vegan restaurant" } = req.query;
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  const apiKey = process.env.EXPO_PUBLIC_GOOGLE_KEY;
 
   if (!lat || !lng || !apiKey) {
     return res.status(400).json({ erro: "Parâmetros obrigatórios ausentes." });

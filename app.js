@@ -15,6 +15,6 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/usuario", usuarioRoutes);
 app.use(uploadRoutes);
-app.use("/externo", googleRoutes);
+app.use("/externo/google", googleRoutes);
 
 module.exports = app;
