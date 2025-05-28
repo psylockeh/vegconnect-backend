@@ -757,7 +757,6 @@ const PostagemController = {
           {
             model: Postagem,
             as: "postagem",
-            attributes: ["id", "titulo", "conteudo", "tp_post", "midia_urls"],
             include: [
               {
                 model: Usuario,
@@ -781,7 +780,24 @@ const PostagemController = {
       return res.status(500).json({ error: "Erro ao listar favoritos da lista." });
     }
   },
-  
+
+  // Verifica status de favorito da Postagem
+   async statusFavorito(req, res) {
+    try {
+      const usuario_id = req.user.id_user;
+      const { lista_id, postagem_id } = req.params;
+
+      const favorito = await Favorito.findOne({
+        where: { usuario_id, lista_id, postagem_id },
+      });
+
+      return res.status(200).json({ favoritado: !!favorito });
+    } catch (error) {
+      console.error("Erro ao verificar status de favorito:", error);
+      return res.status(500).json({ erro: "Erro ao verificar status de favorito." });
+    }
+  },
+
   // Editar nome da lista de favoritos
   async editarListaFavoritos(req, res) {
     try {
