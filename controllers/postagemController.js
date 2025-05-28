@@ -782,22 +782,31 @@ const PostagemController = {
   },
 
   // Verifica status de favorito da Postagem
-   async statusFavorito(req, res) {
+  async statusFavorito(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { lista_id, postagem_id } = req.params;
+      const postagemId = parseInt(req.params.postagem_id, 10);
 
-      const favorito = await Favorito.findOne({
-        where: { usuario_id, lista_id, postagem_id },
+      const listaFavorito = await ListaFavorito.findOne({
+        where: { usuario_id },
+        include: {
+          model: Postagem,
+          where: { id: postagemId },
+          required: true
+        }
       });
 
-      return res.status(200).json({ favoritado: !!favorito });
+      return res.status(200).json({
+        favoritado: !!listaFavorito,
+        listaId: listaFavorito?.id || null
+      });
+
     } catch (error) {
       console.error("Erro ao verificar status de favorito:", error);
       return res.status(500).json({ erro: "Erro ao verificar status de favorito." });
     }
   },
-
+  
   // Editar nome da lista de favoritos
   async editarListaFavoritos(req, res) {
     try {

@@ -47,7 +47,7 @@ router.post(
 );
 
 // Favoritar postagem
-router.post("/listas/:lista_id/postagens/:postagem_id",  postagemController.favoritar);
+router.post("/listas/:lista_id/postagens/:postagem_id", postagemController.favoritar);
 
 // Desfavoritar postagem
 router.delete("/listas/:lista_id/postagens/:postagem_id", postagemController.desfavoritar);
@@ -68,6 +68,6 @@ router.put("/listas/:lista_id", postagemController.editarListaFavoritos);
 router.delete("/listas/:lista_id", postagemController.excluirListaFavoritos);
 
 // Verifica status de favorito da Postagem
-router.get("/listas/:lista_id/postagens/:postagem_id/status",  postagemController.statusFavorito);
+router.get("/listas/status/:postagem_id", postagemController.statusFavorito);
 
 module.exports = router;
