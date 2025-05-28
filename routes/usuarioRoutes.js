@@ -53,7 +53,7 @@ router.post("/listas/:lista_id/postagens/:postagem_id",  postagemController.favo
 router.delete("/listas/:lista_id/postagens/:postagem_id", postagemController.desfavoritar);
 
 //Listar as postagens dentro de uma lista específica
-router.get("/listas/:lista_id", postagemController.listarFavoritos);
+router.get("/listas/:lista_id", postagemController.listarFavoritosDaLista);
 
 //Criar lista de favorito
 router.post("/listas", postagemController.criarListaFavoritos);

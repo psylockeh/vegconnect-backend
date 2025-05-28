@@ -745,29 +745,43 @@ const PostagemController = {
     }
   },
 
-  // Listar postagens favoritedas:
-  async listarFavoritos(req, res) {
+  // Listar postagens favoritedas de uma lista específica
+  async listarFavoritosDaLista(req, res) {
     try {
       const usuario_id = req.user.id_user;
+      const { lista_id } = req.params;
 
       const favoritos = await Favorito.findAll({
-        where: { usuario_id },
+        where: { usuario_id, lista_id },
         include: [
           {
             model: Postagem,
             as: "postagem",
             attributes: ["id", "titulo", "conteudo", "tp_post", "midia_urls"],
+            include: [
+              {
+                model: Usuario,
+                as: "autor",
+                attributes: [
+                  "id_user",
+                  "nome",
+                  "tp_user",
+                  "foto_perfil",
+                  "nickname",
+                ],
+              },
+            ],
           },
         ],
       });
 
-      return res.status(200).json(favoritos.map(f => f.postagem));
+      return res.status(200).json(favoritos);
     } catch (error) {
-      console.error("Erro ao listar favoritos:", error);
-      return res.status(500).json({ erro: "Erro ao buscar favoritos." });
+      console.error(error);
+      return res.status(500).json({ error: "Erro ao listar favoritos da lista." });
     }
   },
-
+  
   // Editar nome da lista de favoritos
   async editarListaFavoritos(req, res) {
     try {
