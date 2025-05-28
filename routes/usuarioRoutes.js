@@ -68,6 +68,6 @@ router.put("/listas/:lista_id", postagemController.editarListaFavoritos);
 router.delete("/listas/:lista_id", postagemController.excluirListaFavoritos);
 
 // Verifica status de favorito da Postagem
-router.get("/listas/status/:postagem_id", postagemController.statusFavorito);
+router.get("/listas/status/:postagem_id", authMiddleware, postagemController.statusFavorito);
 
 module.exports = router;
