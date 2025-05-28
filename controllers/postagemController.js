@@ -436,24 +436,37 @@ const PostagemController = {
 
   // Listar postagens de cada usuário no perfil
   async listarPostagensDoUsuario(req, res) {
-    try {
-      const { id_user } = req.params;
+  try {
+    const { id_user } = req.params;
 
-      const postagens = await Postagem.findAll({
-        where: { usuario_id: id_user },
-        order: [["createdAt", "DESC"]],
-      });
+    const postagens = await Postagem.findAll({
+      where: { usuario_id: id_user },
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: Usuario,
+          as: "autor",
+          attributes: [
+            "id_user",
+            "nome",
+            "tp_user",
+            "foto_perfil",
+            "nickname",
+          ],
+        },
+      ],
+    });
 
-      if (!postagens.length) {
-        return res.status(404).json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
-      }
-
-      return res.status(200).json(postagens);
-    } catch (error) {
-      console.error("Erro ao buscar postagens do usuário:", error);
-      return res.status(500).json({ erro: "Erro ao buscar postagens do usuário." });
+    if (!postagens.length) {
+      return res.status(404).json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
     }
-  },
+
+    return res.status(200).json(postagens);
+  } catch (error) {
+    console.error("Erro ao buscar postagens do usuário:", error);
+    return res.status(500).json({ erro: "Erro ao buscar postagens do usuário." });
+  }
+},
 
   //Pesquisa Geral(Perfil e Usuario)
   async pesquisaGeral(req, res) {
@@ -806,7 +819,7 @@ const PostagemController = {
       return res.status(500).json({ erro: "Erro ao verificar status de favorito." });
     }
   },
-  
+
   // Editar nome da lista de favoritos
   async editarListaFavoritos(req, res) {
     try {
