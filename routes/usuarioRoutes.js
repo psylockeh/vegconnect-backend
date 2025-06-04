@@ -71,7 +71,7 @@ router.delete("/listas/:lista_id", postagemController.excluirListaFavoritos);
 router.get("/listas/status/:postagem_id", authMiddleware, postagemController.statusFavorito);
 
 //Avaliação Postagens, exceto "Recado"
-router.post("/avaliar", authMiddleware, postagemController.avaliar);
+router.post("/avaliar", postagemController.avaliar);
 
 //Verificar Status avaliação
 router.get("/avaliacao/:postagem_id", authMiddleware, postagemController.statusAvaliacao);
