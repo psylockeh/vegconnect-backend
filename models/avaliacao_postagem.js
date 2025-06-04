@@ -37,14 +37,20 @@ module.exports = (sequelize) => {
       estrelas: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        validate: {
+          min: 1,
+          max: 5,
+        },
       },
       comentario_positivo: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
       },
       comentario_negativo: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
       },
     },
     {

@@ -879,42 +879,43 @@ const PostagemController = {
 
   //Avaliação Postagens, exceto "Recado"
   async avaliar(req, res) {
-    try {
-      const { postagem_id, estrelas, comentario_positivo, comentario_negativo } = req.body;
-      const usuario_id = req.user.id_user;
+  try {
+    const { postagem_id, estrelas, comentario_positivo, comentario_negativo } = req.body;
+    const usuario_id = req.user.id_user;
 
-      // Verificar se a postagem existe, exceto "recado"
-      const postagem = await Postagem.findByPk(postagem_id);
-      if (!postagem) {
-        return res.status(404).json({ erro: "Postagem não encontrada." });
-      }
-      if (postagem.tp_post === "recado") {
-        return res.status(400).json({ erro: "Postagens do tipo 'recado' não podem ser avaliadas." });
-      }
-
-      // Verificar se o usuário já avaliou
-      const avaliacaoExistente = await AvaliacaoPostagem.findOne({
-        where: { usuario_id, postagem_id },
-      });
-      if (avaliacaoExistente) {
-        return res.status(400).json({ erro: "Você já avaliou esta postagem." });
-      }
-
-      // Criar avaliação
-      const novaAvaliacao = await AvaliacaoPostagem.create({
-        usuario_id,
-        postagem_id,
-        estrelas,
-        comentario_positivo,
-        comentario_negativo,
-      });
-
-      return res.status(201).json({ msg: "Avaliação registrada com sucesso.", avaliacao: novaAvaliacao });
-    } catch (error) {
-      console.error("Erro ao avaliar postagem:", error);
-      return res.status(500).json({ erro: "Erro interno ao avaliar postagem." });
+    // Verificar se a postagem existe
+    const postagem = await Postagem.findByPk(postagem_id);
+    if (!postagem) {
+      return res.status(404).json({ erro: "Postagem não encontrada." });
     }
-  },
+
+    // Impedir avaliações em postagens do tipo "recado"
+    if (postagem.tp_post === "recado") {
+      return res.status(400).json({ erro: "Postagens do tipo 'recado' não podem ser avaliadas." });
+    }
+
+    // Validar estrelas (supondo que seja uma nota de 1 a 5)
+    if (typeof estrelas !== "number" || estrelas < 1 || estrelas > 5) {
+      return res.status(400).json({ erro: "A avaliação deve ter entre 1 e 5 estrelas." });
+    }
+
+    // Criar avaliação no banco
+    const avaliacao = await AvaliacaoPostagem.create({
+      postagem_id,
+      usuario_id,
+      estrelas,
+      comentario_positivo: comentario_positivo || null,
+      comentario_negativo: comentario_negativo || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return res.status(201).json({ msg: "Avaliação criada com sucesso.", avaliacao });
+  } catch (error) {
+    console.error("Erro ao avaliar postagem:", error);
+    return res.status(500).json({ erro: "Erro ao criar avaliação." });
+  }
+},
 
   //Verificar Status avaliação
   async statusAvaliacao(req, res) {
