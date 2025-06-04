@@ -1,4 +1,4 @@
-const { Postagem, Usuario, ListaFavorito, Favorito } = require("../models");
+const { Postagem, Usuario, ListaFavorito, Favorito, AvaliacaoPostagem } = require("../models");
 const { Op } = require("sequelize");
 const geolocalizarCep = require("../utils/geolocalizarCep");
 
@@ -436,37 +436,37 @@ const PostagemController = {
 
   // Listar postagens de cada usuário no perfil
   async listarPostagensDoUsuario(req, res) {
-  try {
-    const { id_user } = req.params;
+    try {
+      const { id_user } = req.params;
 
-    const postagens = await Postagem.findAll({
-      where: { usuario_id: id_user },
-      order: [["createdAt", "DESC"]],
-      include: [
-        {
-          model: Usuario,
-          as: "autor",
-          attributes: [
-            "id_user",
-            "nome",
-            "tp_user",
-            "foto_perfil",
-            "nickname",
-          ],
-        },
-      ],
-    });
+      const postagens = await Postagem.findAll({
+        where: { usuario_id: id_user },
+        order: [["createdAt", "DESC"]],
+        include: [
+          {
+            model: Usuario,
+            as: "autor",
+            attributes: [
+              "id_user",
+              "nome",
+              "tp_user",
+              "foto_perfil",
+              "nickname",
+            ],
+          },
+        ],
+      });
 
-    if (!postagens.length) {
-      return res.status(404).json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
+      if (!postagens.length) {
+        return res.status(404).json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
+      }
+
+      return res.status(200).json(postagens);
+    } catch (error) {
+      console.error("Erro ao buscar postagens do usuário:", error);
+      return res.status(500).json({ erro: "Erro ao buscar postagens do usuário." });
     }
-
-    return res.status(200).json(postagens);
-  } catch (error) {
-    console.error("Erro ao buscar postagens do usuário:", error);
-    return res.status(500).json({ erro: "Erro ao buscar postagens do usuário." });
-  }
-},
+  },
 
   //Pesquisa Geral(Perfil e Usuario)
   async pesquisaGeral(req, res) {
@@ -795,34 +795,34 @@ const PostagemController = {
   },
 
   // Verifica status de favorito da Postagem
- async statusFavorito(req, res) {
-  try {
-    const usuario_id = req.user.id_user;
-    const postagemId = parseInt(req.params.postagem_id, 10);
+  async statusFavorito(req, res) {
+    try {
+      const usuario_id = req.user.id_user;
+      const postagemId = parseInt(req.params.postagem_id, 10);
 
-    const favorito = await Favorito.findOne({
-      where: {
-        usuario_id,
-        postagem_id: postagemId,
-      },
-      include: [
-        {
-          model: ListaFavorito,
-          as: "lista"
-        }
-      ]
-    });
+      const favorito = await Favorito.findOne({
+        where: {
+          usuario_id,
+          postagem_id: postagemId,
+        },
+        include: [
+          {
+            model: ListaFavorito,
+            as: "lista"
+          }
+        ]
+      });
 
-    return res.status(200).json({
-      favoritado: !!favorito,
-      listaId: favorito?.lista_id || null
-    });
+      return res.status(200).json({
+        favoritado: !!favorito,
+        listaId: favorito?.lista_id || null
+      });
 
-  } catch (error) {
-    console.error("Erro ao verificar status de favorito:", error);
-    return res.status(500).json({ erro: "Erro ao verificar status de favorito." });
-  }
-},
+    } catch (error) {
+      console.error("Erro ao verificar status de favorito:", error);
+      return res.status(500).json({ erro: "Erro ao verificar status de favorito." });
+    }
+  },
 
   // Editar nome da lista de favoritos
   async editarListaFavoritos(req, res) {
@@ -874,6 +874,66 @@ const PostagemController = {
     } catch (error) {
       console.error("Erro ao excluir lista:", error);
       return res.status(500).json({ erro: "Erro ao excluir lista de favoritos." });
+    }
+  },
+
+  //Avaliação Postagens, exceto "Recado"
+  async avaliar(req, res) {
+    try {
+      const { postagem_id, estrelas, comentario_positivo, comentario_negativo } = req.body;
+      const usuario_id = req.user.id_user;
+
+      // Verificar se a postagem existe, exceto "recado"
+      const postagem = await Postagem.findByPk(postagem_id);
+      if (!postagem) {
+        return res.status(404).json({ erro: "Postagem não encontrada." });
+      }
+      if (postagem.tp_post === "recado") {
+        return res.status(400).json({ erro: "Postagens do tipo 'recado' não podem ser avaliadas." });
+      }
+
+      // Verificar se o usuário já avaliou
+      const avaliacaoExistente = await AvaliacaoPostagem.findOne({
+        where: { usuario_id, postagem_id },
+      });
+      if (avaliacaoExistente) {
+        return res.status(400).json({ erro: "Você já avaliou esta postagem." });
+      }
+
+      // Criar avaliação
+      const novaAvaliacao = await AvaliacaoPostagem.create({
+        usuario_id,
+        postagem_id,
+        estrelas,
+        comentario_positivo,
+        comentario_negativo,
+      });
+
+      return res.status(201).json({ msg: "Avaliação registrada com sucesso.", avaliacao: novaAvaliacao });
+    } catch (error) {
+      console.error("Erro ao avaliar postagem:", error);
+      return res.status(500).json({ erro: "Erro interno ao avaliar postagem." });
+    }
+  },
+
+  //Verificar Status avaliação
+  async statusAvaliacao(req, res) {
+    try {
+      const usuario_id = req.user.id_user;
+      const { postagem_id } = req.params;
+
+      const avaliacao = await AvaliacaoPostagem.findOne({
+        where: { usuario_id, postagem_id },
+      });
+
+      if (!avaliacao) {
+        return res.status(200).json({ avaliou: false });
+      }
+
+      return res.status(200).json({ avaliou: true, avaliacao });
+    } catch (error) {
+      console.error("Erro ao verificar avaliação:", error);
+      return res.status(500).json({ erro: "Erro ao verificar status da avaliação." });
     }
   },
 };

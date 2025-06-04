@@ -70,4 +70,10 @@ router.delete("/listas/:lista_id", postagemController.excluirListaFavoritos);
 // Verifica status de favorito da Postagem
 router.get("/listas/status/:postagem_id", authMiddleware, postagemController.statusFavorito);
 
+//Avaliação Postagens, exceto "Recado"
+router.post("/avaliar", authMiddleware, postagemController.avaliar);
+
+//Verificar Status avaliação
+router.get("/avaliacao/:postagem_id", authMiddleware, postagemController.statusAvaliacao);
+
 module.exports = router;
