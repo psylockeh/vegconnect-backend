@@ -76,4 +76,10 @@ router.post("/avaliar", postagemController.avaliar);
 //Verificar Status avaliação
 router.get("/avaliacao/:postagem_id", authMiddleware, postagemController.statusAvaliacao);
 
+// Listar avaliações
+router.get('/avaliacao/:postagem_id', postagemController.listarAvaliacoes);
+
+// Media das avaliações
+router.get("/avaliacao/media/:postagem_id", postagemController.mediaAvaliacoes);
+
 module.exports = router;
