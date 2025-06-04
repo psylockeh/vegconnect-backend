@@ -906,8 +906,6 @@ const PostagemController = {
       estrelas,
       comentario_positivo: comentario_positivo || null,
       comentario_negativo: comentario_negativo || null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
 
     return res.status(201).json({ msg: "Avaliação criada com sucesso.", avaliacao });
