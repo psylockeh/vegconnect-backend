@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'usuario', // tabela que representa o model Usuario
+          model: 'usuario', // Ajuste se o nome da tabela for diferente
           key: 'id_user',
         },
         onUpdate: 'CASCADE',
@@ -23,7 +23,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'postagens', // tabela que representa o model Postagem
+          model: 'postagens',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -34,12 +34,14 @@ module.exports = {
         allowNull: false,
       },
       comentario_positivo: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
       },
       comentario_negativo: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
       },
       createdAt: {
         allowNull: false,
