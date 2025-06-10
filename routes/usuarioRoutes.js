@@ -4,6 +4,9 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const { getPerfil } = require("../controllers/usuarioController");
 const { criar } = require("../controllers/postagemController");
 const postagemController = require("../controllers/postagemController");
+const favoritoController = require("../controllers/favoritoController");
+const avaliacaoController = require("../controllers/avaliacaoController");
+
 
 const router = express.Router();
 
@@ -46,40 +49,21 @@ router.post(
   postagemController.atribuirSelo
 );
 
-// Favoritar postagem
-router.post("/listas/:lista_id/postagens/:postagem_id", postagemController.favoritar);
 
-// Desfavoritar postagem
-router.delete("/listas/:lista_id/postagens/:postagem_id", postagemController.desfavoritar);
+// FavoritOController
+router.post("/listas/:lista_id/postagens/:postagem_id", favoritoController.favoritar);
+router.delete("/listas/:lista_id/postagens/:postagem_id", favoritoController.desfavoritar);
+router.get("/listas/:lista_id", favoritoController.listarFavoritosDaLista);
+router.post("/listas", favoritoController.criarListaFavoritos);
+router.get("/listas", favoritoController.listarListasFavoritos);
+router.put("/listas/:lista_id", favoritoController.editarListaFavoritos);
+router.delete("/listas/:lista_id", favoritoController.excluirListaFavoritos);
+router.get("/listas/status/:postagem_id", authMiddleware, favoritoController.statusFavorito);
 
-//Listar as postagens dentro de uma lista específica
-router.get("/listas/:lista_id", postagemController.listarFavoritosDaLista);
-
-//Criar lista de favorito
-router.post("/listas", postagemController.criarListaFavoritos);
-
-//Listar as listas criadas
-router.get("/listas", postagemController.listarListasFavoritos);
-
-//Editar o nome da lista
-router.put("/listas/:lista_id", postagemController.editarListaFavoritos);
-
-//Excluir lista de favorito e conteúdo
-router.delete("/listas/:lista_id", postagemController.excluirListaFavoritos);
-
-// Verifica status de favorito da Postagem
-router.get("/listas/status/:postagem_id", authMiddleware, postagemController.statusFavorito);
-
-//Avaliação Postagens, exceto "Recado"
-router.post("/avaliar", postagemController.avaliar);
-
-//Verificar Status avaliação
-router.get("/avaliacao/:postagem_id", authMiddleware, postagemController.statusAvaliacao);
-
-// Listar avaliações
-router.get('/avaliacao/:postagem_id', postagemController.listarAvaliacoes);
-
-// Media das avaliações
-router.get("/avaliacao/media/:postagem_id", postagemController.mediaAvaliacoes);
+//AvaliaçãoController
+router.post("/avaliar", avaliacaoController.avaliar);
+router.get("/avaliacao/:postagem_id", authMiddleware, avaliacaoController.statusAvaliacao);
+router.get("/listaravaliacoes/:postagem_id", avaliacaoController.listarAvaliacoes);
+router.get("/avaliacao/media/:postagem_id", avaliacaoController.mediaAvaliacoes);
 
 module.exports = router;
