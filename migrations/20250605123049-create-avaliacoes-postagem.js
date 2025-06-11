@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'usuario', // Ajuste se o nome da tabela for diferente
+          model: 'usuario', 
           key: 'id_user',
         },
         onUpdate: 'CASCADE',

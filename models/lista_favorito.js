@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
       ListaFavorito.belongsTo(models.Usuario, {
         foreignKey: "usuario_id",
         targetKey: "id_user",
-        as: "usuario",
+        as: "autor",
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       });

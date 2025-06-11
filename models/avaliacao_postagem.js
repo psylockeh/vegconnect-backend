@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
       // Relacionamento com o usuário
       AvaliacaoPostagem.belongsTo(models.Usuario, {
         foreignKey: "usuario_id",
-        as: "usuario",
+        as: "autor",
       });
 
       // Relacionamento com a postagem

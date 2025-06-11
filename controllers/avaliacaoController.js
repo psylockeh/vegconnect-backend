@@ -80,7 +80,7 @@ const AvaliacaoController = {
         where: { postagem_id },
         include: [{
           model: Usuario,
-          as: "usuario",
+          as: "autor",
           attributes: [
             "id_user",
             "nome",
