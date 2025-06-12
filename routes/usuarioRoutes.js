@@ -2,11 +2,12 @@ const express = require("express");
 const { atualizarPerfil } = require("../controllers/usuarioController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getPerfil } = require("../controllers/usuarioController");
+const { deletarPerfil } = require("../controllers/usuarioController");
 const { criar } = require("../controllers/postagemController");
 const postagemController = require("../controllers/postagemController");
 const favoritoController = require("../controllers/favoritoController");
 const avaliacaoController = require("../controllers/avaliacaoController");
-
+const pesquisaController = require("../controllers/pesquisaController");
 
 const router = express.Router();
 
@@ -23,6 +24,9 @@ router.get("/perfil/:id_user", authMiddleware, getPerfil);
 // cria postagem
 router.post("/postagens", authMiddleware, criar);
 
+//Deletar Perfil
+router.delete("/deletarPerfil/:id", authMiddleware, deletarPerfil);
+
 // busca postagens
 router.get("/postagens", postagemController.listar);
 
@@ -31,12 +35,6 @@ router.get("/postagens/:id", postagemController.detalhar);
 
 // Listar postagens de cada usuário no perfil
 router.get("/:id_user/postagens", postagemController.listarPostagensDoUsuario);
-
-//Pesquisa Geral(Perfil e Usuario)
-router.get("/pesquisaGeral", postagemController.pesquisaGeral);
-
-//Deletar Perfil
-router.delete("/deletarPerfil/:id", postagemController.deletarPerfil);
 
 //Deletar Postagem
 router.delete("/deletarPostagem/:id", postagemController.deletarPostagem);
@@ -49,6 +47,8 @@ router.post(
   postagemController.atribuirSelo
 );
 
+//PesquisaController
+router.get("/pesquisaGeral", pesquisaController.pesquisaGeral);
 
 // FavoritOController
 router.post("/listas/:lista_id/postagens/:postagem_id", favoritoController.favoritar);

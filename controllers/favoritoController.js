@@ -90,6 +90,13 @@ const FavoritoController = {
           {
             model: Postagem,
             as: "postagem",
+            attributes: [
+              "id",
+              "titulo",
+              "conteudo",
+              "tp_post",
+              "createdAt"
+            ],
             include: [
               {
                 model: Usuario,
