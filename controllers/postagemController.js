@@ -434,6 +434,85 @@ const PostagemController = {
     }
   },
 
+  //Atualizar Postagens
+  async atualizarPostagem(req, res) {
+    try {
+      const { id } = req.params;
+      const dadosAtualizacao = req.body;
+      const usuarioAutenticado = req.user;
+
+      // Buscar postagem existente
+      const postagem = await Postagem.findByPk(id);
+      if (!postagem) {
+        return res.status(404).json({ erro: "Postagem não encontrada." });
+      }
+
+      // Validar autor da postagem
+      if (postagem.usuario_id !== usuarioAutenticado.id_user) {
+        return res.status(403).json({ erro: "Você não tem permissão para editar esta postagem." });
+      }
+
+      // Campos permitidos por tipo de postagem
+      const camposPorTipo = {
+        recado: [
+          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida"
+        ],
+        receita: [
+          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida",
+          "nome_receita", "ingredientes", "instrucoes", "temp_prep", "calorias",
+          "dificuldade", "rendimento_quantidade", "tipo_rendimento"
+        ],
+        evento: [
+          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida",
+          "data", "localizacao", "valor", "links", "tp_evento", "categoria_evento", "modalidade_evento"
+        ],
+        comercio: [
+          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida",
+          "nome_comercio", "descricao_comercio", "tp_comida", "hora_abertura", "hora_fechamento",
+          "cep", "endereco", "tipo_comercio", "tipo_produto", "tipo_servico"
+        ]
+      };
+
+      // Obter o tipo da postagem 
+      const tipoPostagem = postagem.tp_post || "recado";
+
+      // Validar tipo de postagem
+      if (!camposPorTipo[tipoPostagem]) {
+        return res.status(400).json({ erro: `Tipo de postagem inválido: ${tipoPostagem}` });
+      }
+
+      // Atualizar campos permitidos
+      const camposPermitidos = camposPorTipo[tipoPostagem];
+      for (const campo of camposPermitidos) {
+        if (Object.prototype.hasOwnProperty.call(dadosAtualizacao, campo)) {
+          postagem[campo] = dadosAtualizacao[campo];
+        }
+      }
+
+      // Atualizar lat/long se CEP foi alterado e tipo permitir
+      if (dadosAtualizacao.cep && camposPermitidos.includes("cep")) {
+        try {
+          const { latitude, longitude } = await geolocalizarCep(dadosAtualizacao.cep);
+          postagem.latitude = latitude;
+          postagem.longitude = longitude;
+        } catch (err) {
+          console.warn("Erro ao geolocalizar novo CEP:", err.message);
+        }
+      }
+
+      // Atualizar data da última modificação
+      postagem.updatedAt = new Date();
+
+      // Salvar no banco
+      await postagem.save();
+
+      return res.status(200).json({ msg: "Postagem atualizada com sucesso.", postagem });
+    } catch (error) {
+      console.error("Erro ao atualizar postagem:", error);
+      return res.status(500).json({ erro: "Erro ao atualizar postagem." });
+    }
+  },
+
   // Listar postagens de cada usuário no perfil
   async listarPostagensDoUsuario(req, res) {
     try {

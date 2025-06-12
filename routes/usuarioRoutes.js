@@ -36,6 +36,9 @@ router.get("/postagens/:id", postagemController.detalhar);
 // Listar postagens de cada usuário no perfil
 router.get("/:id_user/postagens", postagemController.listarPostagensDoUsuario);
 
+//Atualizar Postagens
+router.put("/atualizarpostagem/:id", postagemController.atualizarPostagem);
+
 //Deletar Postagem
 router.delete("/deletarPostagem/:id", postagemController.deletarPostagem);
 
