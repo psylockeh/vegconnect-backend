@@ -1,4 +1,4 @@
-const { Usuario } = require("../models");
+const { Usuario, Postagem } = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 
@@ -170,7 +170,7 @@ exports.deletarPerfil = async (req, res) => {
       return res.status(404).json({ msg: "❌ Usuário não encontrado." });
     }
 
-    await Postagem.destroy({ where: { usuario_id: id } });
+    await Postagem.destroy({ where: { id_user: id } });
     await Usuario.destroy({ where: { id_user: id } });
 
     return res
