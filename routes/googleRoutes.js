@@ -25,7 +25,7 @@ router.get("/places", async (req, res) => {
 
     const locais = response.data.results.map((r, index) => {
       const photoRef = r.photos?.[0]?.photo_reference;
-      const foto = photoRef
+      const fotos = photoRef
         ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoRef}&key=${apiKey}`
         : null;
 
@@ -36,7 +36,7 @@ router.get("/places", async (req, res) => {
         descricao_comercio: r.formatted_address || "",
         latitude: r.geometry.location.lat,
         longitude: r.geometry.location.lng,
-        foto: foto,
+        fotos: fotos,
         rating: r.rating || null,
       };
     });
