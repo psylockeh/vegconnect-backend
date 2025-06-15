@@ -26,8 +26,10 @@ router.get("/places", async (req, res) => {
     const locais = response.data.results.map((r, index) => {
       const photoRef = r.photos?.[0]?.photo_reference;
       const fotos = photoRef
-        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoRef}&key=${apiKey}`
-        : null;
+        ? [
+            `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoRef}&key=${apiKey}`,
+          ]
+        : [];
 
       return {
         id: 100000 + index,
