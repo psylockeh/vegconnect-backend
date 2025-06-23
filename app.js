@@ -19,7 +19,6 @@ app.use("/auth", authRoutes);
 app.use("/usuario", usuarioRoutes);
 app.use(uploadRoutes);
 app.use("/externo/google", googleRoutes);
-app.use("/interacoes", interacoesRoutes);
 app.use("/comentarios", comentarioRoutes);
 app.use("/curtidas", curtidaRoutes);
 app.use("/reposts", repostRoutes);
