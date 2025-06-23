@@ -50,23 +50,50 @@ router.post(
   postagemController.atribuirSelo
 );
 
+// ComentarioController
+router.post(
+  "/postagens/:id/repostar",
+  autenticar,
+  postagemController.repostarPostagem
+);
+
 //PesquisaController
 router.get("/pesquisaGeral", pesquisaController.pesquisaGeral);
 
 // FavoritOController
-router.post("/listas/:lista_id/postagens/:postagem_id", favoritoController.favoritar);
-router.delete("/listas/:lista_id/postagens/:postagem_id", favoritoController.desfavoritar);
+router.post(
+  "/listas/:lista_id/postagens/:postagem_id",
+  favoritoController.favoritar
+);
+router.delete(
+  "/listas/:lista_id/postagens/:postagem_id",
+  favoritoController.desfavoritar
+);
 router.get("/listas/:lista_id", favoritoController.listarFavoritosDaLista);
 router.post("/listas", favoritoController.criarListaFavoritos);
 router.get("/listas", favoritoController.listarListasFavoritos);
 router.put("/listas/:lista_id", favoritoController.editarListaFavoritos);
 router.delete("/listas/:lista_id", favoritoController.excluirListaFavoritos);
-router.get("/listas/status/:postagem_id", authMiddleware, favoritoController.statusFavorito);
+router.get(
+  "/listas/status/:postagem_id",
+  authMiddleware,
+  favoritoController.statusFavorito
+);
 
 //AvaliaçãoController
 router.post("/avaliar", avaliacaoController.avaliar);
-router.get("/avaliacao/:postagem_id", authMiddleware, avaliacaoController.statusAvaliacao);
-router.get("/listaravaliacoes/:postagem_id", avaliacaoController.listarAvaliacoes);
-router.get("/avaliacao/media/:postagem_id", avaliacaoController.mediaAvaliacoes);
+router.get(
+  "/avaliacao/:postagem_id",
+  authMiddleware,
+  avaliacaoController.statusAvaliacao
+);
+router.get(
+  "/listaravaliacoes/:postagem_id",
+  avaliacaoController.listarAvaliacoes
+);
+router.get(
+  "/avaliacao/media/:postagem_id",
+  avaliacaoController.mediaAvaliacoes
+);
 
 module.exports = router;

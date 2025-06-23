@@ -449,36 +449,80 @@ const PostagemController = {
 
       // Validar autor da postagem
       if (postagem.usuario_id !== usuarioAutenticado.id_user) {
-        return res.status(403).json({ erro: "Você não tem permissão para editar esta postagem." });
+        return res
+          .status(403)
+          .json({ erro: "Você não tem permissão para editar esta postagem." });
       }
 
       // Campos permitidos por tipo de postagem
       const camposPorTipo = {
         recado: [
-          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida"
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "midia_urls",
+          "descricao_resumida",
         ],
         receita: [
-          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida",
-          "nome_receita", "ingredientes", "instrucoes", "temp_prep", "calorias",
-          "dificuldade", "rendimento_quantidade", "tipo_rendimento"
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "midia_urls",
+          "descricao_resumida",
+          "nome_receita",
+          "ingredientes",
+          "instrucoes",
+          "temp_prep",
+          "calorias",
+          "dificuldade",
+          "rendimento_quantidade",
+          "tipo_rendimento",
         ],
         evento: [
-          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida",
-          "data", "localizacao", "valor", "links", "tp_evento", "categoria_evento", "modalidade_evento"
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "midia_urls",
+          "descricao_resumida",
+          "data",
+          "localizacao",
+          "valor",
+          "links",
+          "tp_evento",
+          "categoria_evento",
+          "modalidade_evento",
         ],
         comercio: [
-          "titulo", "conteudo", "categoria", "tag", "midia_urls", "descricao_resumida",
-          "nome_comercio", "descricao_comercio", "tp_comida", "hora_abertura", "hora_fechamento",
-          "cep", "endereco", "tipo_comercio", "tipo_produto", "tipo_servico"
-        ]
+          "titulo",
+          "conteudo",
+          "categoria",
+          "tag",
+          "midia_urls",
+          "descricao_resumida",
+          "nome_comercio",
+          "descricao_comercio",
+          "tp_comida",
+          "hora_abertura",
+          "hora_fechamento",
+          "cep",
+          "endereco",
+          "tipo_comercio",
+          "tipo_produto",
+          "tipo_servico",
+        ],
       };
 
-      // Obter o tipo da postagem 
+      // Obter o tipo da postagem
       const tipoPostagem = postagem.tp_post || "recado";
 
       // Validar tipo de postagem
       if (!camposPorTipo[tipoPostagem]) {
-        return res.status(400).json({ erro: `Tipo de postagem inválido: ${tipoPostagem}` });
+        return res
+          .status(400)
+          .json({ erro: `Tipo de postagem inválido: ${tipoPostagem}` });
       }
 
       // Atualizar campos permitidos
@@ -492,7 +536,9 @@ const PostagemController = {
       // Atualizar lat/long se CEP foi alterado e tipo permitir
       if (dadosAtualizacao.cep && camposPermitidos.includes("cep")) {
         try {
-          const { latitude, longitude } = await geolocalizarCep(dadosAtualizacao.cep);
+          const { latitude, longitude } = await geolocalizarCep(
+            dadosAtualizacao.cep
+          );
           postagem.latitude = latitude;
           postagem.longitude = longitude;
         } catch (err) {
@@ -506,7 +552,9 @@ const PostagemController = {
       // Salvar no banco
       await postagem.save();
 
-      return res.status(200).json({ msg: "Postagem atualizada com sucesso.", postagem });
+      return res
+        .status(200)
+        .json({ msg: "Postagem atualizada com sucesso.", postagem });
     } catch (error) {
       console.error("Erro ao atualizar postagem:", error);
       return res.status(500).json({ erro: "Erro ao atualizar postagem." });
@@ -537,13 +585,17 @@ const PostagemController = {
       });
 
       if (!postagens.length) {
-        return res.status(404).json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
+        return res
+          .status(404)
+          .json({ mensagem: "Nenhuma postagem encontrada para este usuário." });
       }
 
       return res.status(200).json(postagens);
     } catch (error) {
       console.error("Erro ao buscar postagens do usuário:", error);
-      return res.status(500).json({ erro: "Erro ao buscar postagens do usuário." });
+      return res
+        .status(500)
+        .json({ erro: "Erro ao buscar postagens do usuário." });
     }
   },
 
@@ -594,7 +646,7 @@ const PostagemController = {
     }
   },
 
-  // Selo 
+  // Selo
   async atribuirSelo(req, res) {
     const { id } = req.params;
     const { id_user, tp_user } = req.user;
@@ -649,6 +701,23 @@ const PostagemController = {
       return res
         .status(500)
         .json({ msg: "Erro interno ao atribuir selo de confiança." });
+    }
+  },
+
+  async repostarPostagem(req, res) {
+    try {
+      const { id } = req.params;
+      const repost = await Postagem.create({
+        usuario_id: req.user.id_user,
+        tp_post: "repost",
+        repost_de: id,
+      });
+      return res
+        .status(201)
+        .json({ msg: "Repost realizado com sucesso", repost });
+    } catch (error) {
+      console.error("Erro ao repostar:", error);
+      return res.status(500).json({ msg: "Erro interno ao repostar" });
     }
   },
 };

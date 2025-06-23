@@ -117,6 +117,10 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      repost_de: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
 
       // Campos específicos de RECEITA
       temp_prep: {
