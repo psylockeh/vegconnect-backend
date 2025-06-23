@@ -1,13 +1,13 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   criarComentario,
   listarPorPostagem,
-} from "../controllers/comentarioController.js";
-import { authMiddleware } from "../middleware/autenticar.js";
+} = require("../controllers/comentarioController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 router.post("/", authMiddleware, criarComentario);
 router.get("/:postagemId", listarPorPostagem);
 
-export default router;
+module.exports = router;

@@ -1,8 +1,13 @@
 const express = require("express");
-const router = express.Router();
-const RepostController = require("../controllers/repostController");
-const authMiddleware = require("../middlewares/autenticar");
+const {
+  criarRepost,
+  listarRepostsPorUsuario,
+} = require("../controllers/repostController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-router.post("/", authMiddleware, RepostController.criarRepost);
+const router = express.Router();
+
+router.post("/:postagemId", authMiddleware, criarRepost);
+router.get("/usuario/:usuarioId", listarRepostsPorUsuario);
 
 module.exports = router;
