@@ -6,6 +6,9 @@ const authRoutes = require("./routes/authRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const googleRoutes = require("./routes/googleRoutes");
+const comentarioRoutes = require("./routes/comentarioRoutes");
+const curtidaRoutes = require("./routes/curtidaRoutes");
+const repostRoutes = require("./routes/repostRoutes");
 
 const app = express();
 
@@ -16,5 +19,9 @@ app.use("/auth", authRoutes);
 app.use("/usuario", usuarioRoutes);
 app.use(uploadRoutes);
 app.use("/externo/google", googleRoutes);
+app.use("/interacoes", interacoesRoutes);
+app.use("/comentarios", comentarioRoutes);
+app.use("/curtidas", curtidaRoutes);
+app.use("/reposts", repostRoutes);
 
 module.exports = app;
