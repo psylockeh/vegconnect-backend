@@ -1,35 +1,63 @@
-const { Postagem } = require("../models");
+const { Repostagem, Postagem } = require("../models");
 
 const RepostController = {
   async criarRepost(req, res) {
-    const { postagem_id } = req.body;
-    const usuario_id = req.usuario.id_user;
-
     try {
-      const original = await Postagem.findByPk(postagem_id);
+      const usuario_id = req.user.id_user;
+      const { postagemId } = req.params;
 
-      if (!original) {
+      const repostExistente = await Repostagem.findOne({
+        where: { usuario_id, repost_de: postagemId },
+      });
+
+      if (repostExistente) {
         return res
-          .status(404)
-          .json({ msg: "Postagem original não encontrada." });
+          .status(400)
+          .json({ msg: "Postagem já repostada por este usuário." });
       }
 
       const repost = await Postagem.create({
         usuario_id,
         tp_post: "repost",
-        repost_de: original.id,
-        conteudo: original.conteudo,
-        midia_urls: original.midia_urls,
-        titulo: `Repost de @${original.autor?.nickname || "usuário"}`,
-        data: new Date(),
+        repost_de: postagemId,
       });
 
-      return res
-        .status(201)
-        .json({ msg: "Repost criado com sucesso!", repost });
+      await Repostagem.create({
+        usuario_id,
+        repost_de: postagemId,
+        postagem_id: repost.id,
+      });
+
+      return res.status(201).json(repost);
     } catch (error) {
       console.error("Erro ao criar repost:", error);
-      return res.status(500).json({ msg: "Erro interno ao repostar." });
+      return res.status(500).json({ msg: "Erro interno ao criar repost." });
+    }
+  },
+
+  async listarRepostsPorUsuario(req, res) {
+    try {
+      const { usuarioId } = req.params;
+
+      const reposts = await Postagem.findAll({
+        where: {
+          tp_post: "repost",
+          usuario_id: usuarioId,
+        },
+        include: [
+          {
+            model: Postagem,
+            as: "original",
+            include: ["autor"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      return res.status(200).json(reposts);
+    } catch (error) {
+      console.error("Erro ao buscar reposts:", error);
+      return res.status(500).json({ msg: "Erro interno ao listar reposts." });
     }
   },
 };

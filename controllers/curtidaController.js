@@ -1,35 +1,40 @@
 const { Curtida } = require("../models");
 
 const CurtidaController = {
-  async curtir(req, res) {
-    const { postagem_id } = req.body;
-    const usuario_id = req.usuario.id_user;
-
+  async curtirPostagem(req, res) {
     try {
-      const [like, created] = await Curtida.findOrCreate({
-        where: { usuario_id, postagem_id },
+      const usuario_id = req.user.id_user;
+      const { postagemId } = req.params;
+
+      const curtidaExistente = await Curtida.findOne({
+        where: { usuario_id, postagem_id: postagemId },
       });
 
-      if (!created) {
+      if (curtidaExistente) {
         return res
-          .status(409)
-          .json({ msg: "Usuário já curtiu esta postagem." });
+          .status(400)
+          .json({ msg: "Postagem já curtida por este usuário." });
       }
 
-      return res.status(201).json({ msg: "Curtida registrada com sucesso." });
+      const novaCurtida = await Curtida.create({
+        usuario_id,
+        postagem_id: postagemId,
+      });
+
+      return res.status(201).json(novaCurtida);
     } catch (error) {
-      console.error("Erro ao curtir:", error);
-      return res.status(500).json({ msg: "Erro interno ao curtir." });
+      console.error("Erro ao curtir postagem:", error);
+      return res.status(500).json({ msg: "Erro interno ao curtir postagem." });
     }
   },
 
-  async removerCurtir(req, res) {
-    const { postagem_id } = req.params;
-    const usuario_id = req.usuario.id_user;
-
+  async removerCurtida(req, res) {
     try {
+      const usuario_id = req.user.id_user;
+      const { postagemId } = req.params;
+
       const deletado = await Curtida.destroy({
-        where: { usuario_id, postagem_id },
+        where: { usuario_id, postagem_id: postagemId },
       });
 
       if (!deletado) {
@@ -43,18 +48,21 @@ const CurtidaController = {
     }
   },
 
-  async contarCurtidas(req, res) {
-    const { postagem_id } = req.params;
-
+  async verificarCurtida(req, res) {
     try {
-      const total = await Curtida.count({
-        where: { postagem_id },
+      const usuario_id = req.user.id_user;
+      const { postagemId } = req.params;
+
+      const curtida = await Curtida.findOne({
+        where: { usuario_id, postagem_id: postagemId },
       });
 
-      return res.status(200).json({ total });
+      return res.status(200).json({ curtido: !!curtida });
     } catch (error) {
-      console.error("Erro ao contar curtidas:", error);
-      return res.status(500).json({ msg: "Erro interno ao contar curtidas." });
+      console.error("Erro ao verificar curtida:", error);
+      return res
+        .status(500)
+        .json({ msg: "Erro interno ao verificar curtida." });
     }
   },
 };
