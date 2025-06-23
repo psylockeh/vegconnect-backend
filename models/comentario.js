@@ -1,29 +1,53 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/conexao";
+"use strict";
+const { Model, DataTypes } = require("sequelize");
 
-export const Comentario = sequelize.define(
-  "Comentario",
-  {
-    id_comentario: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    postagem_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    usuario_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    conteudo: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-  },
-  {
-    tableName: "comentarios",
-    timestamps: true,
+module.exports = (sequelize) => {
+  class Comentario extends Model {
+    static associate(models) {
+      Comentario.belongsTo(models.Usuario, {
+        foreignKey: "usuario_id",
+        targetKey: "id_user",
+        as: "usuario",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+
+      Comentario.belongsTo(models.Postagem, {
+        foreignKey: "postagem_id",
+        as: "postagem",
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      });
+    }
   }
-);
+
+  Comentario.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      usuario_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      postagem_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      conteudo: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: "Comentario",
+      tableName: "comentarios",
+      timestamps: true,
+    }
+  );
+
+  return Comentario;
+};
