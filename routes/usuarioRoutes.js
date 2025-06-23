@@ -53,7 +53,7 @@ router.post(
 // ComentarioController
 router.post(
   "/postagens/:id/repostar",
-  autenticar,
+  authMiddleware,
   postagemController.repostarPostagem
 );
 
