@@ -1,6 +1,34 @@
 const { Postagem, Usuario } = require("../models");
 const { Op, Sequelize } = require("sequelize");
 const geolocalizarCep = require("../utils/geolocalizarCep");
+const { Curtida } = require("../models");
+
+const curtir = async (req, res) => {
+  const { id_postagem, id_usuario } = req.body;
+
+  if (!id_postagem || !id_usuario) {
+    return res.status(400).json({ erro: "Dados incompletos." });
+  }
+
+  try {
+    const curtidaExistente = await Curtida.findOne({
+      where: { id_postagem, id_usuario },
+    });
+
+    if (curtidaExistente) {
+      await curtidaExistente.destroy();
+      return res.status(200).json({ mensagem: "Curtida removida." });
+    } else {
+      await Curtida.create({ id_postagem, id_usuario });
+      return res
+        .status(201)
+        .json({ mensagem: "Postagem curtida com sucesso." });
+    }
+  } catch (error) {
+    console.error("Erro ao curtir:", error);
+    return res.status(500).json({ erro: "Erro ao processar curtida." });
+  }
+};
 
 const PostagemController = {
   async detalhar(req, res) {

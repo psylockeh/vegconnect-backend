@@ -50,6 +50,9 @@ router.post(
   postagemController.atribuirSelo
 );
 
+// Curtir Postagem
+router.post("/curtir", postagemController.curtir);
+
 // ComentarioController
 router.post(
   "/postagens/:id/repostar",
