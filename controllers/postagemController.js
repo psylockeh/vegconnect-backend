@@ -750,4 +750,4 @@ const PostagemController = {
   },
 };
 
-module.exports = PostagemController;
+module.exports = new PostagemController();
