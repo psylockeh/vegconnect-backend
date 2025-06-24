@@ -60,16 +60,6 @@ router.post(
   postagemController.repostarPostagem
 );
 
-// Repostar Postagem
-router.post(
-  "/postagens/:postagem_id/curtir",
-  postagemController.curtirPostagem
-);
-router.delete(
-  "/postagens/:postagem_id/curtir",
-  postagemController.descurtirPostagem
-);
-
 //PesquisaController
 router.get("/pesquisaGeral", pesquisaController.pesquisaGeral);
 
