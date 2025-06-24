@@ -57,7 +57,11 @@ const CurtidaController = {
         where: { usuario_id, postagem_id: postagemId },
       });
 
-      return res.status(200).json({ curtido: !!curtida });
+      const total = await Curtida.count({
+        where: { postagem_id: postagemId },
+      });
+
+      return res.status(200).json({ curtido: !!curtida, total });
     } catch (error) {
       console.error("Erro ao verificar curtida:", error);
       return res

@@ -39,6 +39,7 @@ module.exports = (sequelize) => {
       tipo: {
         type: DataTypes.ENUM("like", "dislike"),
         allowNull: false,
+        defaultValue: "like",
       },
     },
     {
