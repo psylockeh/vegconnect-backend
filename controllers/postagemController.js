@@ -762,7 +762,9 @@ const PostagemController = {
         usuario_id: req.user.id_user,
         tp_post: "repost",
         repost_de: id,
+        conteudo: "[Repost]",
       });
+
       return res
         .status(201)
         .json({ msg: "Repost realizado com sucesso", repost });
