@@ -3,10 +3,17 @@ const { Curtida } = require("../models");
 const CurtidaController = {
   async curtirPostagem(req, res) {
     try {
-      const usuario_id = req.user.id_user;
+      const usuario_id = req.user?.id_user;
       const { postagemId } = Number(req.params);
 
-      console.log("DEBUG postagemId:", postagemId);
+      console.log("📥 CurtidaController > usuario_id:", usuario_id);
+      console.log("📥 CurtidaController > postagemId:", postagemId);
+
+      if (!usuario_id || !postagemId) {
+        return res
+          .status(400)
+          .json({ msg: "ID do usuário ou postagem ausente." });
+      }
 
       const curtidaExistente = await Curtida.findOne({
         where: { usuario_id, postagem_id: Number(postagemId) },
