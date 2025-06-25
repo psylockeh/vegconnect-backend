@@ -8,6 +8,6 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.post("/", authMiddleware, criarComentario);
-router.get("/:postagemId", listarPorPostagem);
+router.get("/:postagemId", authMiddleware, listarPorPostagem);
 
 module.exports = router;
