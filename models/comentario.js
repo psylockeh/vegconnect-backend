@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
 
   Comentario.init(
     {
-      id: {
+      id_comentario: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
