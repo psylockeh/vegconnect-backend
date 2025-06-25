@@ -4,10 +4,11 @@ const CurtidaController = {
   async curtirPostagem(req, res) {
     try {
       const usuario_id = req.user?.id_user;
-      const { postagemId } = Number(req.params.postagemId);
+      const postagemId = Number(req.params.postagemId);
 
       console.log("📥 CurtidaController > req.user:", req.user);
       console.log("📥 CurtidaController > req.params:", req.params);
+      console.log("📥 CurtidaController > postagemId:", postagemId);
 
       if (!usuario_id || isNaN(postagemId)) {
         return res
@@ -15,15 +16,8 @@ const CurtidaController = {
           .json({ msg: "ID do usuário ou postagem ausente ou inválido." });
       }
 
-      /*
-      if (!usuario_id || !postagemId) {
-        return res
-          .status(400)
-          .json({ msg: "ID do usuário ou postagem ausente." });
-      }
-*/
       const curtidaExistente = await Curtida.findOne({
-        where: { usuario_id, postagem_id: Number(postagemId) },
+        where: { usuario_id, postagem_id: postagemId },
       });
 
       if (curtidaExistente) {
@@ -47,7 +41,13 @@ const CurtidaController = {
   async removerCurtida(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagemId } = Number(req.params);
+      const postagemId = Number(req.params.postagemId);
+
+      if (!usuario_id || isNaN(postagemId)) {
+        return res
+          .status(400)
+          .json({ msg: "ID do usuário ou postagem ausente ou inválido." });
+      }
 
       const deletado = await Curtida.destroy({
         where: { usuario_id, postagem_id: postagemId },
@@ -67,7 +67,13 @@ const CurtidaController = {
   async verificarCurtida(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagemId } = Number(req.params);
+      const postagemId = Number(req.params.postagemId);
+
+      if (!usuario_id || isNaN(postagemId)) {
+        return res
+          .status(400)
+          .json({ msg: "ID do usuário ou postagem ausente ou inválido." });
+      }
 
       const curtida = await Curtida.findOne({
         where: { usuario_id, postagem_id: postagemId },
