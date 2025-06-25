@@ -4,15 +4,15 @@ const CurtidaController = {
   async curtirPostagem(req, res) {
     try {
       const usuario_id = req.user?.id_user;
-      const { postagemId } = Number(req.params);
+      const { postagemId } = Number(req.params.postagemId);
 
       console.log("📥 CurtidaController > req.user:", req.user);
       console.log("📥 CurtidaController > req.params:", req.params);
 
-      if (!req.user?.id_user || !req.params?.postagemId) {
+      if (!usuario_id || isNaN(postagemId)) {
         return res
           .status(400)
-          .json({ msg: "ID do usuário ou postagem ausente." });
+          .json({ msg: "ID do usuário ou postagem ausente ou inválido." });
       }
 
       /*
