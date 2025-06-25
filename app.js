@@ -8,7 +8,6 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const googleRoutes = require("./routes/googleRoutes");
 const comentarioRoutes = require("./routes/comentarioRoutes");
 const curtidaRoutes = require("./routes/curtidaRoutes");
-const repostRoutes = require("./routes/repostRoutes");
 
 const app = express();
 
