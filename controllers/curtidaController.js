@@ -4,7 +4,7 @@ const CurtidaController = {
   async curtirPostagem(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagemId } = req.params;
+      const { postagemId } = Number(req.params);
 
       const curtidaExistente = await Curtida.findOne({
         where: { usuario_id, postagem_id: postagemId },
@@ -31,7 +31,7 @@ const CurtidaController = {
   async removerCurtida(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagemId } = req.params;
+      const { postagemId } = Number(req.params);
 
       const deletado = await Curtida.destroy({
         where: { usuario_id, postagem_id: postagemId },
@@ -51,7 +51,7 @@ const CurtidaController = {
   async verificarCurtida(req, res) {
     try {
       const usuario_id = req.user.id_user;
-      const { postagemId } = req.params;
+      const { postagemId } = Number(req.params);
 
       const curtida = await Curtida.findOne({
         where: { usuario_id, postagem_id: postagemId },

@@ -27,7 +27,8 @@ const ComentarioController = {
 
   async listarPorPostagem(req, res) {
     try {
-      const { postagemId } = req.params;
+      const { postagemId } = Number(req.params);
+      const { id_user } = req.user;
 
       const comentarios = await Comentario.findAll({
         where: { postagem_id: postagemId },
