@@ -17,7 +17,6 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/curtidas", curtidaRoutes);
-app.use("/reposts", repostRoutes);
 app.use("/comentarios", comentarioRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/externo/google", googleRoutes);
