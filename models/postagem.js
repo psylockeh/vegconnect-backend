@@ -5,27 +5,28 @@ const { Model, DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   class Postagem extends Model {
     static associate(models) {
-      // Relação com o autor da postagem
+      Postagem.belongsTo(models.Postagem, {
+        foreignKey: "repost_de",
+        as: "postagemOriginal",
+      });
+
       Postagem.belongsTo(models.Usuario, {
         foreignKey: "usuario_id",
         as: "autor",
       });
 
-      // Relação com o chef que validou a receita
       Postagem.belongsTo(models.Usuario, {
         foreignKey: "verificado_por_id",
         as: "verificado_por",
       });
 
-      // Favorito
       Postagem.hasMany(models.Favorito, {
         foreignKey: "postagem_id",
-        as: "favoritos", // ✅ Alias adicionado
+        as: "favoritos",
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       });
 
-      // Avaliações
       Postagem.hasMany(models.AvaliacaoPostagem, {
         foreignKey: "postagem_id",
         as: "avaliacoes",

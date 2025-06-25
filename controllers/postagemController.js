@@ -135,6 +135,7 @@ const PostagemController = {
           "rendimento_quantidade",
           "tipo_rendimento",
           "descricao_resumida",
+          "repost_de", // importante!
         ],
         include: [
           {
@@ -152,6 +153,28 @@ const PostagemController = {
             model: Usuario,
             as: "verificado_por",
             attributes: ["id_user", "nome", "nickname", "foto_perfil"],
+          },
+          {
+            model: Postagem,
+            as: "postagemOriginal", // conteúdo da postagem repostada
+            attributes: [
+              "id",
+              "usuario_id",
+              "tp_post",
+              "titulo",
+              "conteudo",
+              "categoria",
+              "tag",
+              "midia_urls",
+              "createdAt",
+            ],
+            include: [
+              {
+                model: Usuario,
+                as: "autor",
+                attributes: ["id_user", "nome", "nickname", "foto_perfil"],
+              },
+            ],
           },
         ],
       });

@@ -3,8 +3,17 @@ const { Postagem, Repostagem } = require("../models");
 const RepostController = {
   async criarRepost(req, res) {
     try {
+      if (!req.user || !req.user.id_user) {
+        return res.status(401).json({ msg: "Usuário não autenticado." });
+      }
+
       const usuario_id = req.user.id_user;
       const { postagemId } = req.params;
+
+      const postagemExistente = await Postagem.findByPk(postagemId);
+      if (!postagemExistente) {
+        return res.status(404).json({ msg: "Postagem não encontrada." });
+      }
 
       const repostExistente = await Repostagem.findOne({
         where: { usuario_id, repost_de: postagemId },
