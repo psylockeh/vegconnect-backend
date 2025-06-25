@@ -135,7 +135,7 @@ const PostagemController = {
           "rendimento_quantidade",
           "tipo_rendimento",
           "descricao_resumida",
-          "repost_de", // importante!
+          "repost_de",
         ],
         include: [
           {
@@ -156,7 +156,8 @@ const PostagemController = {
           },
           {
             model: Postagem,
-            as: "postagemOriginal", // conteúdo da postagem repostada
+            as: "postagemOriginal",
+            required: false,
             attributes: [
               "id",
               "usuario_id",
