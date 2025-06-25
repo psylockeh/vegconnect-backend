@@ -7,6 +7,7 @@ module.exports = (sequelize) => {
     static associate(models) {
       Postagem.belongsTo(models.Postagem, {
         foreignKey: "repost_de",
+        targetKey: "id",
         as: "postagemOriginal",
       });
 
