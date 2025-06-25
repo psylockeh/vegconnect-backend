@@ -9,7 +9,7 @@ const CurtidaController = {
       console.log("DEBUG postagemId:", postagemId);
 
       const curtidaExistente = await Curtida.findOne({
-        where: { usuario_id, postagem_id: postagemId },
+        where: { usuario_id, postagem_id: Number(postagemId) },
       });
 
       if (curtidaExistente) {
