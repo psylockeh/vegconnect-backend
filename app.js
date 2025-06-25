@@ -16,11 +16,11 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+app.use("/curtidas", curtidaRoutes);
 app.use("/usuario", usuarioRoutes);
 app.use(uploadRoutes);
 app.use("/externo/google", googleRoutes);
 app.use("/comentarios", comentarioRoutes);
-app.use("/curtidas", curtidaRoutes);
 app.use("/reposts", repostRoutes);
 
 module.exports = app;
