@@ -6,6 +6,8 @@ const CurtidaController = {
       const usuario_id = req.user.id_user;
       const { postagemId } = Number(req.params);
 
+      console.log("DEBUG postagemId:", postagemId);
+
       const curtidaExistente = await Curtida.findOne({
         where: { usuario_id, postagem_id: postagemId },
       });
