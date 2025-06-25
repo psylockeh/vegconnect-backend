@@ -6,15 +6,22 @@ const CurtidaController = {
       const usuario_id = req.user?.id_user;
       const { postagemId } = Number(req.params);
 
-      console.log("📥 CurtidaController > usuario_id:", usuario_id);
-      console.log("📥 CurtidaController > postagemId:", postagemId);
+      console.log("📥 CurtidaController > req.user:", req.user);
+      console.log("📥 CurtidaController > req.params:", req.params);
 
-      if (!usuario_id || !postagemId) {
+      if (!req.user?.id_user || !req.params?.postagemId) {
         return res
           .status(400)
           .json({ msg: "ID do usuário ou postagem ausente." });
       }
 
+      /*
+      if (!usuario_id || !postagemId) {
+        return res
+          .status(400)
+          .json({ msg: "ID do usuário ou postagem ausente." });
+      }
+*/
       const curtidaExistente = await Curtida.findOne({
         where: { usuario_id, postagem_id: Number(postagemId) },
       });
