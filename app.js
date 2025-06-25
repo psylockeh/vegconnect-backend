@@ -17,10 +17,10 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/curtidas", curtidaRoutes);
-app.use("/usuario", usuarioRoutes);
-app.use(uploadRoutes);
-app.use("/externo/google", googleRoutes);
-app.use("/comentarios", comentarioRoutes);
 app.use("/reposts", repostRoutes);
+app.use("/comentarios", comentarioRoutes);
+app.use("/upload", uploadRoutes);
+app.use("/externo/google", googleRoutes);
+app.use("/usuario", usuarioRoutes);
 
 module.exports = app;
