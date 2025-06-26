@@ -134,7 +134,7 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
       ingredientes: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSON,
         allowNull: true,
       },
       nome_receita: {
